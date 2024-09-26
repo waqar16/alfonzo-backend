@@ -1,0 +1,137 @@
+from authentication.serializers import UserSerializer
+from rest_framework import generics
+from django.contrib.auth import get_user_model
+from .permissions import IsAdminSuperUserOrAuditor
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.db.models import Count
+from .models import Template
+from user.models import UserProfile
+from lawyer.models import LawyerProfile
+from .serializers import TemplateSerializer
+
+User = get_user_model()
+
+
+# List all users (admin only)
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+
+# Retrieve and update a specific user (admin only)
+class UserDetailView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+
+# Delete a specific user (admin only)
+class UserDeleteView(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+
+# List all templates (admin only)
+class TemplateListView(generics.ListCreateAPIView):
+    queryset = Template.objects.all()
+    serializer_class = TemplateSerializer
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+
+# Retrieve, update, or delete a specific template (admin only)
+class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Template.objects.all()
+    serializer_class = TemplateSerializer
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+
+class UserActivityOverview(APIView):
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def get(self, request):
+        total_users = User.objects.count()
+        active_users = User.objects.filter(is_active=True).count()
+        inactive_users = total_users - active_users
+        
+        data = {
+            'total_users': total_users,
+            'active_users': active_users,
+            'inactive_users': inactive_users,
+        }
+        
+        return Response(data)
+
+
+class MFAUsageStatistics(APIView):
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def get(self, request):
+        total_users = User.objects.count()
+        users_with_mfa = User.objects.filter(mfa_enabled=True).count()
+        
+        data = {
+            'total_users': total_users,
+            'users_with_mfa': users_with_mfa,
+            'mfa_percentage': (users_with_mfa / total_users * 100) if total_users else 0,
+        }
+        
+        return Response(data)
+
+
+class RoleDistribution(APIView):
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def get(self, request):
+        role_distribution = User.objects.values('role').annotate(count=Count('role'))
+        
+        data = {
+            'role_distribution': list(role_distribution),
+        }
+        
+        return Response(data)
+
+
+class TemplateOverview(APIView):
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def get(self, request):
+        total_templates = Template.objects.count()
+        templates_by_category = Template.objects.values('category').annotate(count=Count('id'))
+
+        data = {
+            'total_templates': total_templates,
+            'templates_by_category': list(templates_by_category),
+        }
+        
+        return Response(data)
+
+
+class MostUsedTemplatesByUser(APIView):
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def get(self, request):
+        # Count how many users have each template
+        most_used_templates = UserProfile.objects.values('template__name').annotate(user_count=Count('id')).order_by('-user_count')
+
+        data = {
+            'most_used_templates': list(most_used_templates),
+        }
+
+        return Response(data)
+
+
+class MostUsedTemplatesByLawyer(APIView):
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def get(self, request):
+        # Count how many users have each template
+        most_used_templates = LawyerProfile.objects.values('template__name').annotate(user_count=Count('id')).order_by('-user_count')
+
+        data = {
+            'most_used_templates': list(most_used_templates),
+        }
+
+        return Response(data)
