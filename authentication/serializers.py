@@ -81,7 +81,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
                 if user.mfa_enabled and not device_exists:
                     send_mfa_code(user)
-                    return {'mfa_required': True, 'message': 'MFA code sent. Please verify.'}
+                    return {'mfa_required': True, 'message': 'MFA code sent. Please verify.','user':user_obj}
 
                 # Generate token for JWT login
                 refresh = self.get_token(user)

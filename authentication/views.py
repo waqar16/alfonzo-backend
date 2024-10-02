@@ -1,4 +1,4 @@
-from datetime import timezone
+from django.utils import timezone 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -127,10 +127,12 @@ class LinkedInCallbackView(APIView):
 
         # Create JWT tokens
         refresh = RefreshToken.for_user(user)
-        return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        })
+        # return Response({
+        #     'refresh': str(refresh),
+        #     'access': str(refresh.access_token),
+        # })
+        redirect_url = f"http://127.0.0.1:3000/profile?refresh={str(refresh)}&access={str(refresh.access_token)}"
+        return redirect(redirect_url)
 
     def get_access_token(self, code):
         """
@@ -214,10 +216,19 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
             # Check if MFA is required and return an appropriate response
             if validated_data.get('mfa_required'):
-                return Response({
-                    'message': validated_data['message'],
-                    'mfa_required': True
-                }, status=status.HTTP_200_OK)
+                # Get the user object from the validated_data (user_obj from serializer)
+                user = validated_data.get('user')
+                if user:
+                    email = user.email  # Safely access user's email if it exists
+                    return Response({
+                        'message': validated_data['message'],
+                        'mfa_required': True,
+                        'email': email
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        'detail': 'User data is missing.'
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
             # Return JWT tokens and user info if authentication is successful
             return Response(validated_data, status=status.HTTP_200_OK)
@@ -254,10 +265,11 @@ class ActivateAccountView(APIView):
         if user is not None and default_token_generator.check_token(user, token):
             user.is_active = True
             user.save()
-            return Response({'status': 'Account activated successfully'}, status=status.HTTP_200_OK)
+            # return Response({'status': 'Account activated successfully'}, status=status.HTTP_200_OK)
+            return redirect('http://localhost:3000/login?activationStatus=success')
         else:
-            return Response({'error': 'Activation link is invalid'}, status=status.HTTP_400_BAD_REQUEST)
-
+            return redirect('http://localhost:3000/activation-email-sent?activationStatus=failed')
+ 
 
 # Deactivate Account View
 class DeactivateAccountView(APIView):
