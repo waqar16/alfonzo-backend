@@ -18,7 +18,7 @@ from .views import (
 urlpatterns = [
     path('signup/', RegisterView.as_view(), name='register'),
     path('login/', MyTokenObtainPairView.as_view(), name='login'),
-    path('auth/user/me/', LoggedInUserView.as_view(), name='logged-in-user'),
+    path('user/me/', LoggedInUserView.as_view(), name='logged-in-user'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
     path('google/', GoogleLoginAPIView.as_view(), name="google-login"),
