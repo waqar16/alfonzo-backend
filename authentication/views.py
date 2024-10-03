@@ -314,7 +314,7 @@ class ResetPasswordView(APIView):
     Handles the password reset process by validating the uid and token,
     checking the current password, and updating it with the new password.
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def post(self, request, *args, **kwargs):
         user = request.user
