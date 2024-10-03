@@ -210,31 +210,27 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'request': request})
-        try:
-            serializer.is_valid(raise_exception=True)
-            validated_data = serializer.validated_data
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
 
-            # Check if MFA is required and return an appropriate response
-            if validated_data.get('mfa_required'):
-                # Get the user object from the validated_data (user_obj from serializer)
-                user = validated_data.get('user')
-                if user:
-                    email = user.email  # Safely access user's email if it exists
-                    return Response({
-                        'message': validated_data['message'],
-                        'mfa_required': True,
-                        'email': email
-                    }, status=status.HTTP_200_OK)
-                else:
-                    return Response({
-                        'detail': 'User data is missing.'
-                    }, status=status.HTTP_400_BAD_REQUEST)
+        # Check if MFA is required and return an appropriate response
+        if validated_data.get('mfa_required'):
+            # Get the user object from the validated_data (user_obj from serializer)
+            user = validated_data.get('user')
+            if user:
+                email = user.email  # Safely access user's email if it exists
+                return Response({
+                    'message': validated_data['message'],
+                    'mfa_required': True,
+                    'email': email
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'detail': 'User data is missing.'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Return JWT tokens and user info if authentication is successful
-            return Response(validated_data, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        # Return JWT tokens and user info if authentication is successful
+        return Response(validated_data, status=status.HTTP_200_OK)
 
 
 # User Profile Data View
