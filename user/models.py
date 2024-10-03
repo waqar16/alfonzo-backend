@@ -9,9 +9,9 @@ User = get_user_model()
 # User Profile
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField()
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255,null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=255, null=True, blank=True)
     profile_pic = models.URLField(null=True, blank=True)
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
