@@ -73,8 +73,8 @@ class GoogleLoginAPIView(APIView):
                 }
             })
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response({"error": "An error occurred"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # LinkedIn OAuth
@@ -149,7 +149,6 @@ class LinkedInCallbackView(APIView):
         response = requests.post(token_url, data=data)
         print(response.json())
         return response.json()
-    
     def get_linkedin_user_info(self, access_token):
         """
         Fetch user profile and email from LinkedIn.
@@ -245,10 +244,10 @@ class LogoutView(APIView):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 # User Profile Data View
 class LoggedInUserView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure the user is logged in
-
     def get(self, request, *args, **kwargs):
         # Get the logged-in user (from the request object)
         user = request.user
@@ -315,29 +314,29 @@ class ResetPasswordView(APIView):
     Handles the password reset process by validating the uid and token,
     checking the current password, and updating it with the new password.
     """
-
     permission_classes = [AllowAny]
     
     def post(self, request, *args, **kwargs):
+        user = request.user
         data = request.data
-        uidb64 = data.get('uid')
-        token = data.get('token')
+        # uidb64 = data.get('uid')
+        # token = data.get('token')
         current_password = data.get('current_password')
         new_password = data.get('new_password')
 
-        if not (uidb64 and token and current_password and new_password):
+        if not (current_password and new_password):
             return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Decode the user ID
-        try:
-            uid = urlsafe_base64_decode(uidb64).decode()
-            user = User.objects.get(pk=uid)
-        except (User.DoesNotExist, ValueError, TypeError):
-            return Response({'error': 'Invalid user ID.'}, status=status.HTTP_400_BAD_REQUEST)
+        # try:
+        #     uid = urlsafe_base64_decode(uidb64).decode()
+        #     user = User.objects.get(pk=uid)
+        # except (User.DoesNotExist, ValueError, TypeError):
+        #     return Response({'error': 'Invalid user ID.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify the token
-        if not default_token_generator.check_token(user, token):
-            return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
+        # if not default_token_generator.check_token(user, token):
+        #     return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify the current password
         if not check_password(current_password, user.password):
