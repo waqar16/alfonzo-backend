@@ -354,7 +354,7 @@ class ChangeUsernameView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        new_username = request.data.get('new_username')
+        new_username = request.data.get('username')
         
         # Ensure the new username is provided
         if not new_username:

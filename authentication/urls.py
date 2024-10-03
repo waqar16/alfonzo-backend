@@ -13,7 +13,8 @@ from .views import (
     MFASettingsView,
     VerifyMFAView,
     LoggedInUserView,
-    LogoutView
+    LogoutView,
+    ChangeUsernameView
 )
 
 urlpatterns = [
@@ -31,4 +32,5 @@ urlpatterns = [
     path('deactivate-account/', DeactivateAccountView.as_view(), name='deactivate-account'),
     path('mfa-settings/', MFASettingsView.as_view(), name='mfa_settings'),
     path('verify-mfa/', VerifyMFAView.as_view(), name='verify_mfa'),
+    path('change-username/', ChangeUsernameView.as_view(), name='change_username'),
 ]
