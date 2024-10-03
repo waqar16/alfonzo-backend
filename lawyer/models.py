@@ -7,12 +7,17 @@ User = get_user_model()
 
 class LawyerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255,null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    phone = models.CharField(max_length=255, null=True, blank=True)
+    profile_pic = models.URLField(null=True, blank=True)
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     membership = models.BooleanField(default=False)
-    mfa = models.BooleanField(default=False)
     theme = models.CharField(max_length=255, default="dark")
     notifications = models.BooleanField(default=True)
-    preferred_language = models.CharField(max_length=255, default="en")  # Fixed typo
+    prefered_language = models.CharField(max_length=255, default="en")
+    email_notifications = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.username

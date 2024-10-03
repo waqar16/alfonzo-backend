@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from rest_framework import generics, permissions
+from .serializers import LawyerProfileSerializer
 
-# Create your views here.
+
+class LawyerProfileDetailUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = LawyerProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.profile
