@@ -8,18 +8,11 @@ from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
 import pyotp
-from twilio.rest import Client
+
 
 User = get_user_model()
 
 
-def send_sms(to, message):
-    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-    client.messages.create(
-        body=message,
-        from_=settings.TWILIO_PHONE_NUMBER,
-        to=to
-    )
 
 
 def send_mfa_code(user):
@@ -42,7 +35,7 @@ def send_mfa_code(user):
     elif user.mfa_method == 'sms':
         # Logic to send code via SMS
         # Example: using Twilio or similar service
-        send_sms(user.phone_number, f"Your MFA code is: {mfa_code}")  # You need to implement send_sms
+        # send_sms(user.phone_number, f"Your MFA code is: {mfa_code}")  # You need to implement send_sms
 
         # Save the code in the user profile for later verification
         user.mfa_code = mfa_code
