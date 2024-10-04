@@ -217,11 +217,17 @@ class MyTokenObtainPairView(TokenObtainPairView):
             # Get the user object from the validated_data (user_obj from serializer)
             user = validated_data.get('user')
             if user:
-                email = user.email  # Safely access user's email if it exists
+                email = user.email
+                username = user.username
+                first_name = user.first_name
+                last_name = user.last_name
                 return Response({
                     'message': validated_data['message'],
                     'mfa_required': True,
-                    'email': email
+                    'email': email,
+                    'username': username,
+                    'first_name': first_name,
+                    'last_name': last_name
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({
@@ -273,9 +279,9 @@ class ActivateAccountView(APIView):
             user.is_active = True
             user.save()
             # return Response({'status': 'Account activated successfully'}, status=status.HTTP_200_OK)
-            return redirect('http://localhost:3000/login?activationStatus=success')
+            return redirect(f"{settings.FRONTEND_BASE_URL}/login?activationStatus=success")
         else:
-            return redirect('http://localhost:3000/activation-email-sent?activationStatus=failed')
+            return redirect(f"{settings.FRONTEND_BASE_URL}/activation-email-sent?activationStatus=failed")
  
 
 # Deactivate Account View
@@ -287,6 +293,17 @@ class DeactivateAccountView(APIView):
         user.is_active = False
         user.save()
         return Response({'status': 'Account deactivated successfully'}, status=status.HTTP_200_OK)
+
+
+# Auth Guard View
+class AuthGuardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return Response({'message': 'User is authenticated'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)  
 
 
 # Reset Password Link View

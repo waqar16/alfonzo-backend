@@ -18,12 +18,16 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
                 first_name=instance.first_name,
                 last_name=instance.last_name,
                 email=instance.email,
-                mfa_enabled=instance.mfa_enabled,
-                mfa_method=instance.mfa_method,
                 phone=instance.phone,
             )
         elif instance.role == 'LAWYER':
-            LawyerProfile.objects.create(user=instance)
+            LawyerProfile.objects.create(
+                user=instance,
+                first_name=instance.first_name,
+                last_name=instance.last_name,
+                email=instance.email,
+                phone=instance.phone,
+            )
 
 
 # Automatically save the profile when the user is updated
