@@ -42,6 +42,7 @@ class GoogleLoginAPIView(APIView):
             email = google_user_info.get('email')
             first_name = google_user_info.get('given_name')
             last_name = google_user_info.get('family_name')
+            profile_picture = google_user_info.get('picture')
 
             # Step 2: Check if the user exists in the database, if not create a new user
             try:
@@ -69,7 +70,8 @@ class GoogleLoginAPIView(APIView):
                     "username": user.username,
                     "email": user.email,
                     "first_name": user.first_name,
-                    "last_name": user.last_name
+                    "last_name": user.last_name,
+                    "profile_picture": profile_picture
                 }
             })
 
