@@ -29,6 +29,8 @@ DEBUG = True
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+ALLOWED_HOSTS = ['waqar123.pythonanywhere.com', 'localhost', '127.0.0.1']
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +48,7 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "django_extensions",
     "django_otp",
+    "corsheaders",
     "django_otp.plugins.otp_totp",
 ]
 
@@ -83,10 +86,6 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
-TWILIO_ACCOUNT_SID = ''
-TWILIO_AUTH_TOKEN = ''
-TWILIO_PHONE_NUMBER = ''
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -103,6 +102,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "corsheaders.middleware.CorsMiddleware",
