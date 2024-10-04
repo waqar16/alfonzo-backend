@@ -15,7 +15,7 @@ class CustomUser(AbstractUser):
         ('email', 'Email'),
         ('sms', 'SMS'),
         ('authenticator', 'Authenticator App')
-    ], null=True, blank=True, default='email')
+    ], null=True, blank=True, default='authenticator')
     mfa_code = models.CharField(max_length=6, null=True, blank=True)
 
     def __str__(self):

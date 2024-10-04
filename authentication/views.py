@@ -396,13 +396,26 @@ class MFASettingsView(APIView):
     def post(self, request):
         user = request.user
         mfa_method = request.data.get('mfa_method')
+        phone = request.data.get('phone')
 
         if mfa_method not in ['email', 'sms', 'authenticator']:
             return Response({'error': 'Invalid MFA method'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user.mfa_method = mfa_method
-        user.mfa_enabled = True
-        user.save()
+        
+        if mfa_method == 'sms':
+            user.phone = phone
+            user.mfa_method = mfa_method
+            user.mfa_enabled = True
+            user.save()
+            
+        elif mfa_method == 'authenticator':
+            user.mfa_method = mfa_method
+            user.mfa_enabled = True
+            user.save()
+            
+        else:
+            user.mfa_method = mfa_method
+            user.mfa_enabled = True
+            user.save()
 
         return Response({'message': 'MFA method updated successfully.'}, status=status.HTTP_200_OK)
 

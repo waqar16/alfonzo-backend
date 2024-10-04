@@ -8,8 +8,18 @@ from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
 import pyotp
+from twilio.rest import Client
 
 User = get_user_model()
+
+
+def send_sms(to, message):
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    client.messages.create(
+        body=message,
+        from_=settings.TWILIO_PHONE_NUMBER,
+        to=to
+    )
 
 
 def send_mfa_code(user):
