@@ -36,7 +36,6 @@ def send_mfa_code(user):
         # Logic to send code via SMS
         # Example: using Twilio or similar service
         # send_sms(user.phone_number, f"Your MFA code is: {mfa_code}")  # You need to implement send_sms
-
         # Save the code in the user profile for later verification
         user.mfa_code = mfa_code
         user.save()
