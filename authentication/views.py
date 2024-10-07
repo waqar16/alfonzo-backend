@@ -398,24 +398,31 @@ class MFASettingsView(APIView):
         mfa_method = request.data.get('mfa_method')
         phone = request.data.get('phone')
 
+        # Check if the provided MFA method is valid
         if mfa_method not in ['email', 'sms', 'authenticator']:
             return Response({'error': 'Invalid MFA method'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not user.phone and mfa_method == 'sms':
-            return Response({'error': 'Phone is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        # If MFA method is SMS, ensure phone is either in the request or already exists on the user object
         if mfa_method == 'sms':
-            user.phone = phone
+            # Check if phone is in the request body or already exists on the user profile
+            if not phone and not user.phone:
+                return Response({'error': 'Phone is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # If phone is in the request body, update the user's phone number
+            if phone:
+                user.phone = phone
+            
             user.mfa_method = mfa_method
             user.mfa_enabled = True
             user.save()
-            
+
         elif mfa_method == 'authenticator':
             user.mfa_method = mfa_method
             user.mfa_enabled = True
             user.save()
-            
+        
         else:
+            # For email MFA or any other method
             user.mfa_method = mfa_method
             user.mfa_enabled = True
             user.save()

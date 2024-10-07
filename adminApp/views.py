@@ -2,6 +2,7 @@ from authentication.serializers import UserSerializer
 from rest_framework import generics
 from django.contrib.auth import get_user_model
 from .permissions import IsAdminSuperUserOrAuditor
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count
@@ -34,11 +35,12 @@ class UserDeleteView(generics.DestroyAPIView):
     permission_classes = [IsAdminSuperUserOrAuditor]
 
 
-# List all templates (admin only)
+# List and create templates (admin only)
 class TemplateListView(generics.ListCreateAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
     permission_classes = [IsAdminSuperUserOrAuditor]
+    # permission_classes = [AllowAny]
 
 
 # Retrieve, update, or delete a specific template (admin only)
@@ -46,6 +48,7 @@ class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
     permission_classes = [IsAdminSuperUserOrAuditor]
+    # permission_classes = [AllowAny]
 
 
 class UserActivityOverview(APIView):
