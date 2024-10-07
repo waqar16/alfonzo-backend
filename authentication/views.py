@@ -426,8 +426,8 @@ class MFASettingsView(APIView):
             user.mfa_method = mfa_method
             user.mfa_enabled = True
             user.save()
-
-        return Response({'message': 'MFA method updated successfully.'}, status=status.HTTP_200_OK)
+            
+        return Response({'message': f'MFA method updated to {mfa_method}'}, status=status.HTTP_200_OK)
 
 
 # Verify MFA View
