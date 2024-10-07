@@ -402,7 +402,7 @@ class MFASettingsView(APIView):
             return Response({'error': 'Invalid MFA method'}, status=status.HTTP_400_BAD_REQUEST)
         
         if not user.phone and mfa_method == 'sms':
-            return Response({'error': 'You did not setup your phone. Please add you phone to setup sms authentication'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Phone is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         if mfa_method == 'sms':
             user.phone = phone
