@@ -44,6 +44,7 @@ def send_mfa_code(user):
         # Ensure the user has a TOTP secret
         if not user.totp_secret:
             user.totp_secret = pyotp.random_base32()  # Generate a new TOTP secret if it doesn't exist
+            user.save()
 
         # Generate a TOTP token
         totp = pyotp.TOTP(user.totp_secret)
@@ -72,8 +73,7 @@ def verify_sms_code(user, code):
 
 def verify_totp_code(user, code):
     # Create a TOTP object and verify the code
-    totp = pyotp.TOTP(user.totp_secret)
-    return totp.verify(code)
+    return user.mfa_code == code
 
 
 def get_google_user_info(access_token):
