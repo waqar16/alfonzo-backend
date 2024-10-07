@@ -39,8 +39,17 @@ class UserDeleteView(generics.DestroyAPIView):
 class TemplateListView(generics.ListCreateAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
-    # permission_classes = [IsAdminSuperUserOrAuditor]
-    permission_classes = [AllowAny]
+
+    # Define custom permission classes
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            # Only admins can create templates
+            self.permission_classes = [AllowAny]
+        else:
+            # Allow any user to list templates
+            self.permission_classes = [AllowAny]
+
+        return super().get_permissions()
 
 
 # Retrieve, update, or delete a specific template (admin only)
