@@ -41,15 +41,20 @@ def send_mfa_code(user):
         user.save()
 
     elif user.mfa_method == 'authenticator':
-        # Generate a TOTP token and send it to the user (e.g., via email or SMS)
-        totp = pyotp.TOTP(user.totp_secret)  # Assumes you have stored a TOTP secret in the user profile
+        # Ensure the user has a TOTP secret
+        if not user.totp_secret:
+            user.totp_secret = pyotp.random_base32()  # Generate a new TOTP secret if it doesn't exist
+
+        # Generate a TOTP token
+        totp = pyotp.TOTP(user.totp_secret)
         mfa_code = totp.now()  # This will generate the current TOTP code
 
-        # You can choose how to send the TOTP code to the user
-        send_mail(subject, f"Your TOTP code is: {mfa_code}", from_email, recipient_list)
+        # Send the TOTP code via email or any method
+        message = f"Your TOTP code is: {mfa_code}"
+        recipient_list = [user.email]  # You can also send via SMS if needed
 
-        # Optionally, store the TOTP secret in the user's profile if not done already
-        # user.totp_secret = generate_totp_secret()  # You need to implement this
+        send_mail(subject, message, from_email, recipient_list)
+
         user.save()
 
 

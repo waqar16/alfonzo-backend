@@ -17,6 +17,7 @@ class CustomUser(AbstractUser):
         ('authenticator', 'Authenticator App')
     ], null=True, blank=True, default='authenticator')
     mfa_code = models.CharField(max_length=6, null=True, blank=True)
+    totp_secret = models.CharField(max_length=16, null=True, blank=True)
 
     def __str__(self):
         return self.username
