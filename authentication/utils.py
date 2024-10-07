@@ -50,7 +50,8 @@ def send_mfa_code(user):
         mfa_code = totp.now()  # This will generate the current TOTP code
 
         # Send the TOTP code via email or any method
-        message = f"Your TOTP code is: {mfa_code}"
+        subject = "Your Time-Based One Time password (TOTP) Code"
+        message = f"Your Time-Based One Time password (TOTP) code is: {mfa_code}"
         recipient_list = [user.email]  # You can also send via SMS if needed
 
         send_mail(subject, message, from_email, recipient_list)
