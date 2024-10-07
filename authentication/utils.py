@@ -68,12 +68,13 @@ def verify_email_code(user, code):
 
 def verify_sms_code(user, code):
     # Compare the code from the user with the stored MFA code
+
     return user.mfa_code == code
 
 
 def verify_totp_code(user, code):
-    # Create a TOTP object and verify the code
-    return user.mfa_code == code
+    totp = pyotp.TOTP(user.totp_secret)
+    return totp.verify(code, valid_window=1)
 
 
 def get_google_user_info(access_token):
