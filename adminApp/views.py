@@ -39,16 +39,16 @@ class UserDeleteView(generics.DestroyAPIView):
 class TemplateListView(generics.ListCreateAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
-    permission_classes = [IsAdminSuperUserOrAuditor]
-    # permission_classes = [AllowAny]
+    # permission_classes = [IsAdminSuperUserOrAuditor]
+    permission_classes = [AllowAny]
 
 
 # Retrieve, update, or delete a specific template (admin only)
 class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
-    permission_classes = [IsAdminSuperUserOrAuditor]
-    # permission_classes = [AllowAny]
+    # permission_classes = [IsAdminSuperUserOrAuditor]
+    permission_classes = [AllowAny]
 
 
 class UserActivityOverview(APIView):

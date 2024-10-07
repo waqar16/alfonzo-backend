@@ -493,4 +493,4 @@ class VerifyMFAView(APIView):
                 }
                 return Response(data, status=status.HTTP_200_OK)
 
-        return Response({'error': 'Invalid MFA code'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Invalid MFA code or may be exipred if you are using TOTP'}, status=status.HTTP_400_BAD_REQUEST)

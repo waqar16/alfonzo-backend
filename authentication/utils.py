@@ -51,14 +51,61 @@ def send_mfa_code(user):
         mfa_code = totp.now()  # This will generate the current TOTP code
 
         # Send the TOTP code via email or any method
-        subject = "Your Time-Based One Time password (TOTP) Code"
-        message = f"Your Time-Based One Time password (TOTP) code is: {mfa_code}"
-        recipient_list = [user.email]  # You can also send via SMS if needed
-        from_email = settings.DEFAULT_FROM_EMAIL
+        # Create the HTML email content
+    subject = "Your Time-Based One-Time Password (TOTP) Code"
+    message = f"""
+        <html>
+        <head>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    padding: 20px;
+                    color: #333;
+                }}
+                .container {{
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                }}
+                h1 {{
+                    color: #4CAF50;
+                }}
+                .code {{
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #4CAF50;
+                }}
+                .footer {{
+                    margin-top: 20px;
+                    font-size: 12px;
+                    color: #777;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Your TOTP Code</h1>
+                <p>Your Time-Based One-Time Password (TOTP) code is:</p>
+                <div class="code">{mfa_code}</div>
+                <p>This code is valid for only 30 seconds.</p>
+                <p>Please use it to log in to your accoutn.</p>
+                <p> In case of invalid code please request a new code by re-logging in.</p>
+                <div class="footer">
+                    <p>If you did not request this code, please ignore this email.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
 
-        send_mail(subject, message, from_email, recipient_list)
+    recipient_list = [user.email]  # You can also send via SMS if needed
+    from_email = settings.DEFAULT_FROM_EMAIL
 
-        user.save()
+    send_mail(subject, message, from_email, recipient_list, html_message=message)
+
+    user.save()
 
 
 def verify_email_code(user, code):
