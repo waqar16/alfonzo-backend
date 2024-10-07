@@ -53,6 +53,7 @@ def send_mfa_code(user):
         subject = "Your Time-Based One Time password (TOTP) Code"
         message = f"Your Time-Based One Time password (TOTP) code is: {mfa_code}"
         recipient_list = [user.email]  # You can also send via SMS if needed
+        from_email = settings.DEFAULT_FROM_EMAIL
 
         send_mail(subject, message, from_email, recipient_list)
 
