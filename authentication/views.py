@@ -18,7 +18,7 @@ import requests
 from django.conf import settings
 from django.shortcuts import redirect
 from django.contrib.auth.hashers import check_password
-from user.models import UserDevice
+from user.models import UserDevice, UserProfile
 
 
 User = get_user_model()
@@ -60,6 +60,15 @@ class GoogleLoginAPIView(APIView):
                 )
                 user.set_unusable_password()
                 user.save()
+                
+                UserProfile.objects.create(
+                    user=user,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    profile_pic=profile_picture
+                )
+                UserProfile.save()
 
             # Step 3: Issue JWT token for the user
             refresh = RefreshToken.for_user(user)
@@ -109,6 +118,7 @@ class LinkedInCallbackView(APIView):
         email = linkedin_user_data['email']
         first_name = linkedin_user_data['first_name']
         last_name = linkedin_user_data['last_name']
+        profile_picture = linkedin_user_data['profile_picture']
         # Handle user creation or retrieval
 
         try:
@@ -126,6 +136,15 @@ class LinkedInCallbackView(APIView):
             )
             user.set_unusable_password()
             user.save()
+            
+            UserProfile.objects.create(
+                user=user,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                profile_pic=profile_picture
+             )
+            UserProfile.save()
 
         # Create JWT tokens
         refresh = RefreshToken.for_user(user)
