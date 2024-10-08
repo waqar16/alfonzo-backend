@@ -24,7 +24,7 @@ class LawyerProfile(models.Model):
 
 
 class LawyerDocument(models.Model):
-    user = models.ForeignKey(LawyerProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     preferred_lawyer = models.ForeignKey(
         LawyerProfile,
         on_delete=models.CASCADE,
