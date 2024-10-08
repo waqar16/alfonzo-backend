@@ -26,7 +26,7 @@ FRONTEND_BASE_URL = "http://localhost:3000"
 SECRET_KEY = "django-insecure-w6fy#(hybwevp-c_k%!p3ie0zt70kcqaf_s(_46!wnniwcywl1"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 CORS_ALLOW_ALL_ORIGINS = True
 
