@@ -15,7 +15,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserDocumentSerializer(serializers.Serializer):
     class Meta:
         model = UserDocument
-        fields = '__all__'
+        fields = ['selected_lawyer', 'title', 'base64_content', 'pdf_url', 'template']
 
     def create(self, validated_data):
         # Assume the user is passed in the request data
