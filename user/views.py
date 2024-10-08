@@ -29,6 +29,7 @@ class UserDocumentListCreateView(generics.ListCreateAPIView):
     """
     List all user documents or create a new document.
     """
+    queryset = UserDocument.objects.all()
     serializer_class = UserDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
