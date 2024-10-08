@@ -20,7 +20,7 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
                 email=instance.email,
                 phone=instance.phone,
             )
-        elif instance.role == 'LAWYER':
+        elif instance.role == 'Lawyer':
             LawyerProfile.objects.create(
                 user=instance,
                 first_name=instance.first_name,
@@ -28,7 +28,6 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
                 email=instance.email,
                 phone=instance.phone,
             )
-
 
 # Automatically save the profile when the user is updated
 @receiver(post_save, sender=User)
