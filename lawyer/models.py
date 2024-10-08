@@ -40,7 +40,7 @@ class LawyerDocument(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.title} - {self.user.user.username}"
+        return f"{self.title} - {self.user.username}"
 
 
 class LawyerApproval(models.Model):

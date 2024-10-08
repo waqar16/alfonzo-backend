@@ -38,8 +38,7 @@ class UserDocument(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-
-        return self.title + " - " + self.user.user.username
+        return self.title + " - " + self.user.username
 
 
 # Device model
