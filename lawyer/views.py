@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .serializers import LawyerProfileSerializer
-from .models import Lawyerprofile
+from .models import LawyerProfile
 
 
 # Create a new lawyer profile (if it doesn't exist)
@@ -20,4 +20,4 @@ class LawyerProfileDetailUpdateView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         # Return the user profile of the authenticated user
-        return Lawyerprofile.objects.get(user=self.request.user)
+        return LawyerProfile.objects.get(user=self.request.user)
