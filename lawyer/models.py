@@ -32,7 +32,6 @@ class LawyerDocument(models.Model):
         null=True,
         blank=True
     )
-    title = models.CharField(max_length=255)
     base64_content = models.TextField()
     pdf_url = models.URLField(null=True, blank=True)
     template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True, null=True)
