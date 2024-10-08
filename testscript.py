@@ -30,8 +30,8 @@ def create_user_and_profile(username, email, password, role):
 
 if __name__ == "__main__":
     # Test data for user creation
-    username = 'waqar'
-    email = 'm2sbM66j@example.com'
+    username = 'war'
+    email = 'm6j@example.com'
     password = 'testpass'
     role = 'Lawyer'  # You can change this to 'LAWYER' to test LawyerProfile creation
 

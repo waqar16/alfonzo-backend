@@ -12,7 +12,7 @@ class LawyerProfile(models.Model):
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=255, null=True, blank=True)
     profile_pic = models.URLField(null=True, blank=True)
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE, null=True, blank=True)
     membership = models.BooleanField(default=False)
     theme = models.CharField(max_length=255, default="dark")
     notifications = models.BooleanField(default=True)
