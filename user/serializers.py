@@ -12,13 +12,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserDocumentSerializer(serializers.Serializer):
+class UserDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDocument
         fields = ['selected_lawyer', 'title', 'base64_content', 'pdf_url', 'template']
+        # We don't include 'user' here because we handle it in the view
 
     def create(self, validated_data):
-        # Assume the user is passed in the request data
-        user = validated_data.pop('user', None)  # Extract the user
-        user_document = UserDocument.objects.create(user=user, **validated_data)
-        return user_document
+        # Automatically set the user field before saving
+        user = validated_data.pop('user', None)  # This will not be provided, so it's okay
+        return UserDocument.objects.create(user=self.context['request'].user, **validated_data)
