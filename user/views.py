@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
 from .models import UserProfile, UserDocument
 from .serializers import UserProfileSerializer, UserDocumentSerializer
+from rest_framework.response import Response
+from rest_framework import status
 
 
 # Create a new user profile (if it doesn't exist)
@@ -25,15 +27,41 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
         return UserProfile.objects.get(user=self.request.user)
 
 
-class UserDocumentListCreateView(generics.ListCreateAPIView):
+# class UserDocumentListCreateView(generics.ListCreateAPIView):
+#     """
+#     List all user documents or create a new document.
+#     """
+#     queryset = UserDocument.objects.all()
+#     serializer_class = UserDocumentSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+
+class UserDocumentCreateView(generics.CreateAPIView):
     """
-    List all user documents or create a new document.
+    Create a new UserDocument instance.
     """
-    queryset = UserDocument.objects.all()
     serializer_class = UserDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
+    def perform_create(self, serializer):
+        """
+        Save the new document with the currently logged-in user.
+        """
+        # Assign the user from the request
+        serializer.save(user=self.request.user)
+        
+    def create(self, request, *args, **kwargs):
+        # Print incoming data for debugging
+        print("Request data:", request.data)
+        
+        # Create the UserDocument
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print("Validation errors:", serializer.errors)  # Debugging
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDocumentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
