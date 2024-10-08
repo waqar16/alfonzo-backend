@@ -2,9 +2,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
 from .models import UserProfile, UserDocument
 from .serializers import UserProfileSerializer, UserDocumentSerializer
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import viewsets
 
 
 # Create a new user profile (if it doesn't exist)
@@ -31,6 +28,10 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
 class UserDocumentListCreateAPIView(generics.ListCreateAPIView):
     queryset = UserDocument.objects.all()
     serializer_class = UserDocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)  # Set the user field to the authenticated user
 
 
 class UserDocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):

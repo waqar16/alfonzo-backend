@@ -16,7 +16,9 @@ class UserDocumentSerializer(serializers.Serializer):
     class Meta:
         model = UserDocument
         fields = '__all__'
-    
+
     def create(self, validated_data):
-        # Create and return a new UserDocument instance, given the validated data
-        return UserDocument.objects.create(**validated_data)
+        # Assume the user is passed in the request data
+        user = validated_data.pop('user', None)  # Extract the user
+        user_document = UserDocument.objects.create(user=user, **validated_data)
+        return user_document
