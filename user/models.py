@@ -33,7 +33,7 @@ class UserDocument(models.Model):
     title = models.CharField(max_length=255)
     base64_content = models.TextField()
     pdf_url = models.URLField(null=True, blank=True)
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE , blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
