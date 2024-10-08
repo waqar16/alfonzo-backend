@@ -112,4 +112,4 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'email', 'phone', 'mfa_method', 'mfa_enabled')
+        fields = ('first_name', 'last_name', 'username', 'email', 'phone', 'role',  'mfa_method', 'mfa_enabled')
