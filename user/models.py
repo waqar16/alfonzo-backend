@@ -34,6 +34,8 @@ class UserDocument(models.Model):
     base64_content = models.TextField()
     pdf_url = models.URLField(null=True, blank=True)
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
 
