@@ -29,7 +29,7 @@ class UserProfile(models.Model):
 # Documents model
 class UserDocument(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    prefered_lawyer = models.ForeignKey(LawyerProfile, on_delete=models.CASCADE, related_name="preferred_lawyer", null=True, blank=True)
+    selected_lawyer = models.ForeignKey(LawyerProfile, on_delete=models.CASCADE, related_name="preferred_lawyer", null=True, blank=True)
     title = models.CharField(max_length=255)
     content = models.TextField()
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
