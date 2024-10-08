@@ -32,22 +32,7 @@ class UserDocumentListCreateView(generics.ListCreateAPIView):
     serializer_class = UserDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        """
-        Optionally restricts the returned documents to a given user,
-        by filtering against a `user` query parameter in the URL.
-        """
-        queryset = UserDocument.objects.all()
-        user_id = self.request.query_params.get('user', None)
-        if user_id is not None:
-            queryset = queryset.filter(user__id=user_id)
-        return queryset
 
-    def perform_create(self, serializer):
-        """
-        Save the new document with the currently logged-in user.
-        """
-        serializer.save(user=self.request.user)
 
 
 class UserDocumentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
