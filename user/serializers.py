@@ -16,3 +16,7 @@ class UserDocumentSerializer(serializers.Serializer):
     class Meta:
         model = UserDocument
         fields = '__all__'
+    
+    def create(self, validated_data):
+        # Create and return a new UserDocument instance, given the validated data
+        return UserDocument.objects.create(**validated_data)

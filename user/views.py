@@ -8,7 +8,6 @@ from .serializers import UserProfileSerializer, UserDocumentSerializer
 class UserProfileCreateView(generics.CreateAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
 
     def perform_create(self, serializer):
         # Automatically associate the authenticated user with the profile
