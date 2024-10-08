@@ -7,4 +7,4 @@ class LawyerProfileDetailUpdateView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.AllowAny]
 
     def get_object(self):
-        return self.request.user.profile
+        return self.request.user.username
