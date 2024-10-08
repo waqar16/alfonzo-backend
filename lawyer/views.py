@@ -4,7 +4,7 @@ from .models import LawyerProfile
 
 
 # Create a new lawyer profile (if it doesn't exist)
-class UserProfileCreateView(generics.CreateAPIView):
+class LawyerProfileCreateView(generics.CreateAPIView):
     serializer_class = LawyerProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -16,7 +16,7 @@ class UserProfileCreateView(generics.CreateAPIView):
 # Retrieve, update or delete a lawyer profile       
 class LawyerProfileDetailUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = LawyerProfileSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         # Return the user profile of the authenticated user
