@@ -4,6 +4,7 @@ from .models import UserProfile, UserDocument
 from .serializers import UserProfileSerializer, UserDocumentSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
 
 
 # Create a new user profile (if it doesn't exist)
@@ -27,14 +28,9 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
         return UserProfile.objects.get(user=self.request.user)
 
 
-# class UserDocumentListCreateView(generics.ListCreateAPIView):
-#     """
-#     List all user documents or create a new document.
-#     """
-#     queryset = UserDocument.objects.all()
-#     serializer_class = UserDocumentSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
+class UserDocumentViewSet(viewsets.ModelViewSet):
+    queryset = UserDocument.objects.all()
+    serializer_class = UserDocumentSerializer
 
 class UserDocumentCreateView(generics.CreateAPIView):
     """
@@ -62,6 +58,7 @@ class UserDocumentCreateView(generics.CreateAPIView):
         else:
             print("Validation errors:", serializer.errors)  # Debugging
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class UserDocumentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
