@@ -24,6 +24,8 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('api/', include('adminApp.urls')),
     path('api/', include('user.urls')),
+    path('api/', include('notification.urls')),
+    path('api/', include('activity.urls')),
     path('feedback/', include('feedback.urls')),
     path('contact-us/', include('contact.urls')),
 ]

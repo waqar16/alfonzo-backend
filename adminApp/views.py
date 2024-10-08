@@ -16,10 +16,22 @@ User = get_user_model()
 
 # List all users (admin only)
 class UserListView(generics.ListAPIView):
-    queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [IsAdminSuperUserOrAuditor]
 
+    def get_queryset(self):
+        # Get role from query params
+        role = self.request.query_params.get('role', None)
+
+        # Base queryset for all users ordered by the date they joined
+        queryset = User.objects.all().order_by('-date_joined')
+
+        # Filter users by role if a role is specified in the query params
+        if role:
+            queryset = queryset.filter(role=role)
+
+        return queryset
+    
 
 # Retrieve and update a specific user (admin only)
 class UserDetailView(generics.RetrieveUpdateAPIView):
