@@ -74,7 +74,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
                     raise serializers.ValidationError({
                         "detail": "Your account is inactive. We've sent you a new activation email."
                     })
-        
+
                 # Check device information
                 device_identifier = self.context['request'].META['HTTP_USER_AGENT']
                 device_exists = UserDevice.objects.filter(user=user, device_identifier=device_identifier).exists()

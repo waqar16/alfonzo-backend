@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
     mfa_method = models.CharField(max_length=20, choices=[
         ('email', 'Email'),
         ('sms', 'SMS'),
-        ('authenticator', 'Authenticator App')
+        ('authenticator', 'Authenticator')
     ], null=True, blank=True, default='authenticator')
     mfa_code = models.CharField(max_length=6, null=True, blank=True)
     totp_secret = models.CharField(max_length=16, null=True, blank=True)
