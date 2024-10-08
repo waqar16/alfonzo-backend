@@ -34,5 +34,5 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
 def save_profile(sender, instance, **kwargs):
     if instance.role == 'User' and hasattr(instance, 'user_profile'):
         instance.user_profile.save()
-    elif instance.role == 'LAWYER' and hasattr(instance, 'lawyer_profile'):
+    elif instance.role == 'Lawyer' and hasattr(instance, 'lawyer_profile'):
         instance.lawyer_profile.save()
