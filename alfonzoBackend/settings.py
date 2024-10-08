@@ -59,6 +59,7 @@ LOCAL_APPS = [
     "membership",
     "notification",
     "adminApp",
+    "drive",
     "activity",
     "feedback",
     "contact",

@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/', include('user.urls')),
     path('api/', include('lawyer.urls')),
     path('api/', include('notification.urls')),
+    path('api/', include('drive.urls')),
     path('api/', include('activity.urls')),
     path('feedback/', include('feedback.urls')),
     path('contact-us/', include('contact.urls')),
