@@ -10,6 +10,7 @@ from .models import Template
 from user.models import UserProfile
 from lawyer.models import LawyerProfile
 from .serializers import TemplateSerializer
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -28,10 +29,10 @@ class UserListView(generics.ListAPIView):
 
         # Filter users by role if a role is specified in the query params
         if role:
-            queryset = queryset.filter(role=role)
+            queryset = queryset.filter(Q(role__iexact=role))
 
         return queryset
-    
+
 
 # Retrieve and update a specific user (admin only)
 class UserDetailView(generics.RetrieveUpdateAPIView):
