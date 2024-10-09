@@ -322,7 +322,7 @@ class AuthGuardView(APIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return Response({'message': 'User is authenticated', 'user': request.user.role}, status=status.HTTP_200_OK)
+            return Response({'message': 'User is authenticated', 'role': request.user.role}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)  
 
