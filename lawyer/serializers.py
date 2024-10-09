@@ -54,7 +54,7 @@ class UserQuerySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context['request']
         user = request.user
-        
+        validated_data.pop('user', None)
         # Create the UserQuery instance without needing to pop the user
         return UserQuery.objects.create(user=user, **validated_data)
 
