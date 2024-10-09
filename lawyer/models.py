@@ -53,7 +53,7 @@ class UserQuery(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="queries")
     lawyer = models.ForeignKey(LawyerProfile, on_delete=models.CASCADE, related_name="queries_received")
     message = models.TextField()
-    # timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Query from {self.user.username} to {self.lawyer.user.username} at {self.timestamp}"
