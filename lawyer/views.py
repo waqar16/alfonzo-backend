@@ -1,8 +1,15 @@
 from rest_framework import generics, permissions
-from .serializers import LawyerProfileSerializer
-from .models import LawyerProfile
+from .serializers import (LawyerProfileSerializer,
+                          LawyerDocumentSerializer,
+                          UserQuerySerializer,
+                          LawyerVerificationUpdateSerializer,
+                          UserDocumentListSerializer,
+                          LawyerDocumentListSerializer
+                          )
+from .models import LawyerProfile, LawyerDocument, UserQuery
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from user.models import UserDocument
 
 
 # Create a new lawyer profile (if it doesn't exist)
@@ -36,3 +43,61 @@ class LawyerProfileListView(generics.ListAPIView):
     def get_queryset(self):
         # Return all lawyer profiles
         return LawyerProfile.objects.all()
+
+
+class LawyerDocumentListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = LawyerDocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only the documents created by the authenticated user
+        return LawyerDocument.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)  # Set the user field to the authenticated user
+
+
+class LawyerDocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = LawyerDocument.objects.all()
+    serializer_class = LawyerDocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class SendQueryToLawyerAPIView(generics.CreateAPIView):
+    queryset = UserQuery.objects.all()
+    serializer_class = UserQuerySerializer
+    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can send queries
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)  # Set the authenticated user as the sender
+
+
+class LawyerUpdateVerificationAPIView(generics.UpdateAPIView):
+    queryset = LawyerDocument.objects.all()
+    serializer_class = LawyerVerificationUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the lawyer is authenticated
+
+    def get_queryset(self):
+        """
+        Restrict the queryset to documents where the current user is the selected lawyer.
+        """
+        return LawyerDocument.objects.filter(selected_lawyer__user=self.request.user)
+
+
+class CombinedDocumentsListAPIView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the lawyer is authenticated
+
+    def get_queryset(self):
+        """
+        Retrieve documents from both UserDocument and LawyerDocument where the current user is the selected lawyer.
+        """
+        user_documents = UserDocument.objects.filter(selected_lawyer__user=self.request.user)
+        lawyer_documents = LawyerDocument.objects.filter(lawyer=self.request.user)  # Adjust the filter as necessary
+
+        return user_documents | lawyer_documents  # Combine both querysets
+
+    def get_serializer_class(self):
+        """
+        Return the appropriate serializer class based on the document type.
+        """
+        return UserDocumentListSerializer if self.request.GET.get('type') == 'user' else LawyerDocumentListSerializer

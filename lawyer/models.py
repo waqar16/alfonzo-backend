@@ -25,7 +25,7 @@ class LawyerProfile(models.Model):
 
 class LawyerDocument(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    preferred_lawyer = models.ForeignKey(
+    selected_lawyer = models.ForeignKey(
         LawyerProfile,
         on_delete=models.CASCADE,
         related_name="preferred_lawyer_documents",
@@ -36,12 +36,27 @@ class LawyerDocument(models.Model):
     base64_content = models.TextField()
     pdf_url = models.URLField(null=True, blank=True)
     template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True, null=True)
+    verification_status = models.CharField(max_length=255, default="Not Specified", choices=[
+        ('Not Specified', 'Not Specified'),
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected ', 'Rejected'),
+    ])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.title} - {self.user.username}"
 
+
+class UserQuery(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="queries")
+    lawyer = models.ForeignKey(LawyerProfile, on_delete=models.CASCADE, related_name="queries_received")
+    message = models.TextField()
+    query = models.TextField()
+
+    def __str__(self):
+        return f"Query from {self.user.username} to {self.lawyer.user.username}"
 
 class LawyerApproval(models.Model):
     lawyer = models.ForeignKey('LawyerProfile', on_delete=models.CASCADE)

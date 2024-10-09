@@ -17,7 +17,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email', 'phone', 'mfa_method', 'mfa_enabled', 'first_name', 'last_name')
+        fields = ('username', 'password', 'password2', 'email', 'phone', 'mfa_method', 'mfa_enabled', 'first_name', 'last_name', 'role')
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -29,6 +29,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         if User.objects.filter(username=attrs['username']).exists():
             raise serializers.ValidationError({"username": "A user with that username already exists."})
         
+        # Prevent admin and auditor roles from signing up
+        if attrs.get('role') in ['ADMIN', 'AUDITOR']:  # Adjust as per your role constants
+            raise serializers.ValidationError({"role": "Admin and Auditor roles cannot register."})
+        
         return attrs
 
     def create(self, validated_data):
@@ -38,6 +42,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             is_active=False,
+            phone=validated_data['phone'],
+            role=validated_data['role']
         )
         user.set_password(validated_data['password'])
         user.save()

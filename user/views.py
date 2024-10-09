@@ -1,7 +1,6 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
 from .models import UserProfile, UserDocument
-from .serializers import UserProfileSerializer, UserDocumentSerializer
+from .serializers import UserProfileSerializer, UserDocumentSerializer, LawyerVerificationUpdateSerializer
 
 
 # Create a new user profile (if it doesn't exist)
@@ -26,9 +25,12 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
 
 
 class UserDocumentListCreateAPIView(generics.ListCreateAPIView):
-    queryset = UserDocument.objects.all()
     serializer_class = UserDocumentSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only the documents created by the authenticated user
+        return UserDocument.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)  # Set the user field to the authenticated user
@@ -37,3 +39,16 @@ class UserDocumentListCreateAPIView(generics.ListCreateAPIView):
 class UserDocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserDocument.objects.all()
     serializer_class = UserDocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class LawyerUpdateVerificationAPIView(generics.UpdateAPIView):
+    queryset = UserDocument.objects.all()
+    serializer_class = LawyerVerificationUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the lawyer is authenticated
+
+    def get_queryset(self):
+        """
+        Restrict the queryset to documents where the current user is the selected lawyer.
+        """
+        return UserDocument.objects.filter(selected_lawyer__user=self.request.user)
