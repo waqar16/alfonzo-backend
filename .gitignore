@@ -1,7 +1,5 @@
 # Ignore migration files
-*/migrations/*.py
-*/migrations/*.pyc
-*/migrations/__init__.py
+*/migrations/*
 
 # Ignore SQLite database
 db.sqlite3  # Adjust the filename if your database has a different name
