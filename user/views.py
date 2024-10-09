@@ -24,7 +24,7 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
         return UserProfile.objects.get(user=self.request.user)
 
 
-class UserDocumentListCreateAPIView(generics.RetrieveUpdateDestroyAPIView):
+class UserDocumentListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = UserDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
