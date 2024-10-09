@@ -34,8 +34,7 @@ class LawyerDocumentSerializer(serializers.ModelSerializer):
 class UserQuerySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserQuery
-        fields = ['id', 'user', 'lawyer', 'message', 'timestamp']
-        read_only_fields = ['user', 'timestamp']
+        fields = '__all__'
 
     def create(self, validated_data):
         # Automatically set the user when creating a new query
