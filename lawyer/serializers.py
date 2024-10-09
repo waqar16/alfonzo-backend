@@ -34,7 +34,7 @@ class LawyerDocumentSerializer(serializers.ModelSerializer):
 class UserQuerySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserQuery
-        fields = ['id', 'lawyer', 'message']
+        fields = ['id', 'user', 'lawyer', 'message']
 
     def create(self, validated_data):
         # Automatically set the user when creating a new query
