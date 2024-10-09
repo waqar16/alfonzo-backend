@@ -1,5 +1,4 @@
 import os
-import base64
 import io
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,96 +8,45 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
-# class UploadPDFView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request):
-#         # Check if a file is provided in the request
-#         if 'file' not in request.FILES:
-#             return Response({'error': 'No file provided. Please upload a PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         file = request.FILES['file']
-
-#         # Check if the uploaded file is a PDF
-#         if not file.name.endswith('.pdf'):
-#             return Response({'error': 'Uploaded file is not a PDF. Please upload a valid PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         # Update this path to the actual location of your credentials.json file
-#         creds_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'credentials.json')
-
-#         # Authenticate with Google Drive API
-#         creds = service_account.Credentials.from_service_account_file(
-#             creds_path,
-#             scopes=['https://www.googleapis.com/auth/drive.file']
-#         )
-
-#         drive_service = build('drive', 'v3', credentials=creds)
-
-#         file_metadata = {
-#             'name': file.name,
-#             'mimeType': 'application/pdf'
-#         }
-
-#         # Use BytesIO to read the file into memory
-#         file_stream = io.BytesIO(file.read())
-
-#         # Create a MediaIoBaseUpload object for the in-memory file
-#         media = MediaIoBaseUpload(file_stream, mimetype='application/pdf')
-
-#         # Upload file to Google Drive
-#         try:
-#             uploaded_file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-#             file_id = uploaded_file.get('id')
-
-#             # Make the file publicly accessible
-#             drive_service.permissions().create(
-#                 fileId=file_id,
-#                 body={'role': 'reader', 'type': 'anyone'},
-#             ).execute()
-
-#             # Generate the file URL
-#             file_url = f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
-#             return Response({'file_url': file_url}, status=status.HTTP_200_OK)
-#         except Exception as e:
-#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 class UploadPDFView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # Get the base64-encoded file from the request body
-        pdf_base64 = request.data.get('file_base64')
+        # Check if a file is provided in the request
+        if 'file' not in request.FILES:
+            return Response({'error': 'No file provided. Please upload a PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not pdf_base64:
-            return Response({'error': 'No Base64-encoded file provided. Please upload a PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
+        file = request.FILES['file']
 
+        # Check if the uploaded file is a PDF
+        if not file.name.endswith('.pdf'):
+            return Response({'error': 'Uploaded file is not a PDF. Please upload a valid PDF file.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update this path to the actual location of your credentials.json file
+        creds_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'credentials.json')
+
+        # Authenticate with Google Drive API
+        creds = service_account.Credentials.from_service_account_file(
+            creds_path,
+            scopes=['https://www.googleapis.com/auth/drive.file']
+        )
+
+        drive_service = build('drive', 'v3', credentials=creds)
+
+        file_metadata = {
+            'name': file.name,
+            'mimeType': 'application/pdf'
+        }
+
+        # Use BytesIO to read the file into memory
+        file_stream = io.BytesIO(file.read())
+
+        # Create a MediaIoBaseUpload object for the in-memory file
+        media = MediaIoBaseUpload(file_stream, mimetype='application/pdf')
+
+        # Upload file to Google Drive
         try:
-            # Decode the base64-encoded file
-            pdf_data = base64.b64decode(pdf_base64)
-
-            # Create an in-memory file object using BytesIO
-            file_stream = io.BytesIO(pdf_data)
-            file_stream.name = 'uploaded_document.pdf'  # You can set the file name here
-
-            # Authenticate with Google Drive API
-            creds_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'credentials.json')
-            creds = service_account.Credentials.from_service_account_file(
-                creds_path,
-                scopes=['https://www.googleapis.com/auth/drive.file']
-            )
-            drive_service = build('drive', 'v3', credentials=creds)
-
-            # File metadata for Google Drive
-            file_metadata = {
-                'name': file_stream.name,
-                'mimeType': 'application/pdf'
-            }
-
-            # Create a MediaIoBaseUpload object for the in-memory file
-            media = MediaIoBaseUpload(file_stream, mimetype='application/pdf')
-
-            # Upload the file to Google Drive
             uploaded_file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
             file_id = uploaded_file.get('id')
 
@@ -111,6 +59,5 @@ class UploadPDFView(APIView):
             # Generate the file URL
             file_url = f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
             return Response({'file_url': file_url}, status=status.HTTP_200_OK)
-
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
