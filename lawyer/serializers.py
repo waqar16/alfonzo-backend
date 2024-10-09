@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import LawyerProfile, LawyerDocument, UserQuery
 from user.models import UserDocument
+from authentication.serializers import UserSerializer
 
 
 class LawyerProfileSerializer(serializers.ModelSerializer):
@@ -34,13 +35,27 @@ class LawyerDocumentSerializer(serializers.ModelSerializer):
 class UserQuerySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserQuery
-        fields = ['id', 'user', 'lawyer', 'message']
+        fields = ['id', 'lawyer', 'message']  # Exclude 'user' field from the model
+
+    def to_representation(self, instance):
+        """ Customize the output to include user details from the request.user. """
+        representation = super().to_representation(instance)
+        user = self.context['request'].user
+        
+        # Add user info directly from the request.user
+        representation['user'] = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,  # Add other user fields as necessary
+        }
+        
+        return representation
 
     def create(self, validated_data):
-        # Automatically set the user when creating a new query
         request = self.context['request']
         user = request.user
-        validated_data.pop('user', None) 
+        
+        # Create the UserQuery instance without needing to pop the user
         return UserQuery.objects.create(user=user, **validated_data)
 
 
