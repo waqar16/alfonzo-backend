@@ -40,6 +40,7 @@ class UserQuerySerializer(serializers.ModelSerializer):
         # Automatically set the user when creating a new query
         request = self.context['request']
         user = request.user
+        validated_data.pop('user', None) 
         return UserQuery.objects.create(user=user, **validated_data)
 
 
