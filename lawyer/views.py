@@ -63,7 +63,7 @@ class LawyerDocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class SendQueryToLawyerAPIView(generics.CreateAPIView):
+class SendQueryToLawyerAPIView(generics.ListCreateAPIView):
     queryset = UserQuery.objects.all()
     serializer_class = UserQuerySerializer
     permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can send queries
