@@ -10,6 +10,7 @@ from .models import LawyerProfile, LawyerDocument, UserQuery
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from user.models import UserDocument
+from rest_framework.response import Response
 
 
 # Create a new lawyer profile (if it doesn't exist)
@@ -92,14 +93,27 @@ class CombinedDocumentsListAPIView(generics.ListAPIView):
         Retrieve documents from both UserDocument and LawyerDocument where the current user is the selected lawyer.
         """
         user_documents = UserDocument.objects.filter(selected_lawyer__user=self.request.user)
-        lawyer_documents = LawyerDocument.objects.filter(selected_lawyer__user=self.request.user)  # Adjusted to correct field
+        lawyer_documents = LawyerDocument.objects.filter(user=self.request.user)  # Use user instead of lawyer
 
-        return user_documents | lawyer_documents  # Combine both querysets
+        return user_documents, lawyer_documents  # Return both querysets separately
+
+    def get(self, request, *args, **kwargs):
+        user_documents, lawyer_documents = self.get_queryset()
+
+        user_documents_data = UserDocumentListSerializer(user_documents, many=True).data
+        lawyer_documents_data = LawyerDocumentListSerializer(lawyer_documents, many=True).data
+
+        # Combine the data into a single response
+        combined_data = {
+            'user_documents': user_documents_data,
+            'lawyer_documents': lawyer_documents_data
+        }
+
+        return Response(combined_data)
 
     def get_serializer_class(self):
         """
         Return the appropriate serializer class based on the document type.
         """
-        if self.request.GET.get('type') == 'user':
-            return UserDocumentListSerializer
-        return LawyerDocumentListSerializer
+        # You can customize this if you want to switch between serializers based on a query parameter
+        return UserDocumentListSerializer if self.request.GET.get('type') == 'user' else LawyerDocumentListSerializer
