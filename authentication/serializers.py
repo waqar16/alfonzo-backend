@@ -98,6 +98,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"email": "A user with that email already exists."})
         if User.objects.filter(username=attrs.get('username')).exists():
             raise serializers.ValidationError({"username": "A user with that username already exists."})
+        if User.objects.filter(phone=attrs.get('phone')).exists():
+            raise serializers.ValidationError({"phone": "A user with that phone already exists."})
         
         # Prevent admin and auditor roles from signing up
         if attrs.get('role') in ['ADMIN', 'AUDITOR']:  # Adjust as per your role constants
