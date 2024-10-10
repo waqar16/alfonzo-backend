@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import LawyerProfile, LawyerDocument, UserQuery
 from user.models import UserDocument
-from authentication.serializers import UserSerializer
 
 
 class LawyerProfileSerializer(serializers.ModelSerializer):

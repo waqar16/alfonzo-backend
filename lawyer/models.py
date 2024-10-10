@@ -29,8 +29,6 @@ class LawyerDocument(models.Model):
         LawyerProfile,
         on_delete=models.CASCADE,
         related_name="preferred_lawyer_documents",
-        null=True,
-        blank=True
     )
     title = models.CharField(max_length=255)
     base64_content = models.TextField()
