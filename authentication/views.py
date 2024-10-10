@@ -60,10 +60,8 @@ class GoogleLoginAPIView(APIView):
                 
                 # Check if the user has a usable password
                 if user.has_usable_password():
-                    return Response(
-                        {"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                    return Response({"error": "It looks like your account is not linked with LinkedIn. Please login with the same email and password you set while creating the account."}, status=status.HTTP_400_BAD_REQUEST)
+
 
             except ObjectDoesNotExist:
                 # User does not exist; create a new user
@@ -189,6 +187,7 @@ class LinkedInCallbackView(APIView):
         response = requests.post(token_url, data=data)
         print(response.json())
         return response.json()
+    
     def get_linkedin_user_info(self, access_token):
         """
         Fetch user profile and email from LinkedIn.
