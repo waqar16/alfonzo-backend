@@ -46,12 +46,15 @@ class GoogleLoginAPIView(APIView):
             profile_picture = google_user_info.get('picture')
 
             # Step 2: Check if the user exists in the database, if not create a new user
-            try:
-                user = User.objects.get(email=email)
+            user = User.objects.get(email=email)
+            
+            if user:
                 if user.has_usable_password():
-                    Response({"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."}, status=status.HTTP_400_BAD_REQUEST)
-
-            except User.DoesNotExist:
+                    return Response(
+                        {"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            else:
                 user = User.objects.create(
                     username=generate_unique_username(email.split('@')[0]),
                     email=email,
@@ -61,15 +64,15 @@ class GoogleLoginAPIView(APIView):
                 )
                 user.set_unusable_password()
                 user.save()
-                
-                UserProfile.objects.create(
+             
+                user_profile = UserProfile.objects.create(
                     user=user,
                     first_name=first_name,
                     last_name=last_name,
                     email=email,
                     profile_pic=profile_picture
                 )
-                UserProfile.save()
+                user_profile.save()
 
             # Step 3: Issue JWT token for the user
             refresh = RefreshToken.for_user(user)
