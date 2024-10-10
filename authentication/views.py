@@ -89,7 +89,7 @@ class GoogleLoginAPIView(APIView):
             })
 
         except Exception:
-            return Response({"error": "An error occurred"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "An error occurred please try again"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # LinkedIn OAuth
