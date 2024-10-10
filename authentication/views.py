@@ -169,7 +169,7 @@ class LinkedInCallbackView(APIView):
         #     'refresh': str(refresh),
         #     'access': str(refresh.access_token),
         # })
-        redirect_url = f"{settings.FRONTEND_BASE_URL}/linkendin-login?email={str(email)}&access={str(refresh.access_token)}"
+        redirect_url = f"{settings.FRONTEND_BASE_URL}/linkedin-login?email={str(email)}&access={str(refresh.access_token)}"
         return redirect(redirect_url)
 
     def get_access_token(self, code):
