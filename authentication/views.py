@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from .utils import get_google_user_info, generate_unique_username
 from .utils import send_password_reset_email, verify_email_code
 from .utils import verify_sms_code, verify_totp_code
+from .utils import send_activation_email
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 from django.conf import settings
@@ -408,6 +409,23 @@ class ChangeUsernameView(APIView):
         user.save()
 
         return Response({'message': 'Username successfully updated'}, status=status.HTTP_200_OK)
+
+
+# Resend Activation Email View
+class ResendActivationEmailView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(email=email).first()
+        if user:
+            send_activation_email(user)
+            return Response({'message': 'Activation email sent to your email.'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 # MFA Settings View

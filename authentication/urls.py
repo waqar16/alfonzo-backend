@@ -15,7 +15,8 @@ from .views import (
     LoggedInUserView,
     LogoutView,
     ChangeUsernameView,
-    AuthGuardView
+    AuthGuardView,
+    ResendActivationEmailView,
 )
 
 urlpatterns = [
@@ -35,4 +36,5 @@ urlpatterns = [
     path('verify-mfa/', VerifyMFAView.as_view(), name='verify_mfa'),
     path('change-username/', ChangeUsernameView.as_view(), name='change_username'),
     path('auth-guard/', AuthGuardView.as_view(), name='auth_guard'),
+    path('resend-activation-email/', ResendActivationEmailView.as_view(), name='resend_activation_email'),
 ]
