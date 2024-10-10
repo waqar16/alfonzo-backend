@@ -171,7 +171,7 @@ class LinkedInCallbackView(APIView):
         #     'refresh': str(refresh),
         #     'access': str(refresh.access_token),
         # })
-        redirect_url = f"http://127.0.0.1:3000/profile?refresh={str(refresh)}&access={str(refresh.access_token)}"
+        redirect_url = f"{settings.FRONTEND_URL}/profile?refresh={str(refresh)}&access={str(refresh.access_token)}"
         return redirect(redirect_url)
 
     def get_access_token(self, code):
