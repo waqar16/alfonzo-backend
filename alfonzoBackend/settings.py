@@ -100,7 +100,7 @@ DEFAULT_EMAIL_FROM = 'wa4752928@gmail.com'
 
 LINKEDIN_CLIENT_ID = '779cc1edmxkdjf'
 LINKEDIN_CLIENT_SECRET = 'WPL_AP1.czZPT17SkWPIQo3V.lhFwkA=='
-LINKEDIN_REDIRECT_URI = 'http://localhost:8000/auth/linkedin/callback'
+LINKEDIN_REDIRECT_URI = 'https://waqar123.pythonanywhere.com/auth/linkedin/callback'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

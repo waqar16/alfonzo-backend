@@ -158,7 +158,7 @@ def send_activation_email(user):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
 
-    activation_link = f"http://127.0.0.1:8000/auth/activate/{uid}/{token}/"
+    activation_link = f"https://waqar123.pythonanywhere.com/auth/activate/{uid}/{token}/"
 
     subject = 'Activate your account'
     from_email = settings.DEFAULT_FROM_EMAIL
@@ -196,7 +196,7 @@ def send_password_reset_email(user):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
 
-    reset_link = f"http://127.0.0.1:8000/auth/password-reset/{uid}/{token}/"
+    reset_link = f"https://waqar123.pythonanywhere.com/auth/password-reset/{uid}/{token}/"
 
     subject = 'Reset your password'
     from_email = settings.DEFAULT_FROM_EMAIL
