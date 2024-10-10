@@ -16,6 +16,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, required=True)
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    role = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User
@@ -41,14 +43,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Safely get first_name and last_name, providing defaults if not present
         first_name = validated_data.get('first_name', '')
         last_name = validated_data.get('last_name', '')
+        phone = validated_data.get('phone', '')
+        role = validated_data.get('role', 'User')
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
             first_name=first_name,
             last_name=last_name,
             is_active=False,
-            phone=validated_data['phone'],
-            role=validated_data['role']
+            phone=phone,
+            role=role,
         )
         user.set_password(validated_data['password'])
         user.save()
