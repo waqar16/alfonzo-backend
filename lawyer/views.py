@@ -92,17 +92,16 @@ class CombinedDocumentsListAPIView(generics.ListAPIView):
         """
         Retrieve documents from both UserDocument and LawyerDocument where the current user is the selected lawyer.
         """
+        # Filter user documents where pdf_url is not empty
         user_documents = UserDocument.objects.filter(
             selected_lawyer__user=self.request.user,
-            pdf_url__isnull=False,  # Ensure pdf_url is not null
-            pdf_url__gt=''  # Ensure pdf_url is not an empty string
+            pdf_url__isnull=False  # Ensure pdf_url is not null
         )
 
-        # Filter lawyer documents where pdf_url is not empty or null
+        # Filter lawyer documents where pdf_url is not empty
         lawyer_documents = LawyerDocument.objects.filter(
             user=self.request.user,
-            pdf_url__isnull=False,  # Ensure pdf_url is not null
-            pdf_url__gt=''  # Ensure pdf_url is not an empty string
+            pdf_url__isnull=False  # Ensure pdf_url is not null
         )
 
         return user_documents, lawyer_documents  # Return both querysets separately
@@ -110,13 +109,16 @@ class CombinedDocumentsListAPIView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         user_documents, lawyer_documents = self.get_queryset()
 
+        # Serialize user documents
         user_documents_data = UserDocumentListSerializer(user_documents, many=True).data
+
+        # Serialize lawyer documents
         lawyer_documents_data = LawyerDocumentListSerializer(lawyer_documents, many=True).data
 
         # Combine the data into a single response
         combined_data = {
-            'user_documents': user_documents_data,
-            'lawyer_documents': lawyer_documents_data
+            'count': len(user_documents_data) + len(lawyer_documents_data),
+            'results': user_documents_data + lawyer_documents_data
         }
 
         return Response(combined_data)
@@ -125,5 +127,4 @@ class CombinedDocumentsListAPIView(generics.ListAPIView):
         """
         Return the appropriate serializer class based on the document type.
         """
-        # You can customize this if you want to switch between serializers based on a query parameter
         return UserDocumentListSerializer if self.request.GET.get('type') == 'user' else LawyerDocumentListSerializer
