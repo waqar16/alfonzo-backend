@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import LawyerProfile, LawyerDocument, UserQuery
 from user.models import UserDocument
-from user.serializers import UserProfileSerializer
+from authentication.serializers import UserSerializer
 from adminApp.serializers import TemplateSerializer
 
 
@@ -67,7 +67,7 @@ class LawyerVerificationUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserDocumentListSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()  # Nest the UserSerializer
+    user = UserSerializer()  # Nest the UserSerializer
     template = TemplateSerializer()  # Nest the TemplateSerializer
 
     class Meta:
@@ -76,7 +76,7 @@ class UserDocumentListSerializer(serializers.ModelSerializer):
 
 
 class LawyerDocumentListSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()  # Nest the UserSerializer
+    user = UserSerializer()  # Nest the UserSerializer
     template = TemplateSerializer()  # Nest the TemplateSerializer
 
     class Meta:
