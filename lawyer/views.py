@@ -92,7 +92,7 @@ class CombinedDocumentsListAPIView(generics.ListAPIView):
         Retrieve documents from both UserDocument and LawyerDocument where the current user is the selected lawyer.
         """
         user_documents = UserDocument.objects.filter(selected_lawyer__user=self.request.user)
-        lawyer_documents = LawyerDocument.objects.filter(lawyer=self.request.user)  # Adjust the filter as necessary
+        lawyer_documents = LawyerDocument.objects.filter(selected_lawyer__user=self.request.user)  # Adjusted to correct field
 
         return user_documents | lawyer_documents  # Combine both querysets
 
@@ -100,4 +100,6 @@ class CombinedDocumentsListAPIView(generics.ListAPIView):
         """
         Return the appropriate serializer class based on the document type.
         """
-        return UserDocumentListSerializer if self.request.GET.get('type') == 'user' else LawyerDocumentListSerializer
+        if self.request.GET.get('type') == 'user':
+            return UserDocumentListSerializer
+        return LawyerDocumentListSerializer
