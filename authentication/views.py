@@ -20,6 +20,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.contrib.auth.hashers import check_password
 from user.models import UserDevice, UserProfile
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 
 User = get_user_model()
@@ -27,51 +28,69 @@ User = get_user_model()
 
 # Google Login
 class GoogleLoginAPIView(APIView):
-
     permission_classes = [AllowAny]
 
     def post(self, request):
         access_token = request.data.get("access_token")
 
+        # Validate access token presence
         if not access_token:
             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Step 1: Verify the Google access token and get user info
-        google_user_info = get_google_user_info(access_token)
+        try:
+            # Step 1: Verify the Google access token and get user info
+            google_user_info = get_google_user_info(access_token)
 
-        email = google_user_info.get('email')
-        first_name = google_user_info.get('given_name')
-        last_name = google_user_info.get('family_name')
-        profile_picture = google_user_info.get('picture')
+            # Check if we got user info
+            if not google_user_info:
+                return Response({"error": "Failed to retrieve user information from Google."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Step 2: Check if the user exists in the database, if not create a new user
-        user = User.objects.get(email=email)
-    
-        if user:
-            if user.has_usable_password():
-                return Response(
-                    {"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."},
-                    status=status.HTTP_400_BAD_REQUEST
+            email = google_user_info.get('email')
+            first_name = google_user_info.get('given_name', '')
+            last_name = google_user_info.get('family_name', '')
+            profile_picture = google_user_info.get('picture', '')
+
+            # Validate email presence
+            if not email:
+                return Response({"error": "Email not provided by Google."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Step 2: Check if the user exists in the database
+            try:
+                user = User.objects.get(email=email)
+                
+                # Check if the user has a usable password
+                if user.has_usable_password():
+                    return Response(
+                        {"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            except ObjectDoesNotExist:
+                # User does not exist; create a new user
+                user = User.objects.create(
+                    username=generate_unique_username(email.split('@')[0]),
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    is_active=True
                 )
-        else:
-            user = User.objects.create(
-                username=generate_unique_username(email.split('@')[0]),
-                email=email,
-                first_name=first_name,
-                last_name=last_name,
-                is_active=True
-            )
-            user.set_unusable_password()
-            user.save()
-            
-            user_profile = UserProfile.objects.create(
-                user=user,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                profile_pic=profile_picture
-            )
-            user_profile.save()
+                user.set_unusable_password()  # Set unusable password for Google login
+                user.save()
+                
+                # Create user profile
+                UserProfile.objects.create(
+                    user=user,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    profile_pic=profile_picture
+                )
+
+            except MultipleObjectsReturned:
+                return Response({"error": "Multiple users found with this email. Please contact support."}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error": "An error occurred during Google login."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # Step 3: Issue JWT token for the user
         refresh = RefreshToken.for_user(user)
@@ -85,7 +104,7 @@ class GoogleLoginAPIView(APIView):
                 "last_name": user.last_name,
                 "profile_picture": profile_picture
             }
-        })
+        }, status=status.HTTP_200_OK)
 
 
 # LinkedIn OAuth
