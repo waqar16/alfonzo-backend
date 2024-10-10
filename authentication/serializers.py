@@ -14,14 +14,10 @@ User = get_user_model()
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
-    first_name = serializers.CharField(required=False, allow_blank=True)
-    last_name = serializers.CharField(required=False, allow_blank=True)
-    phone = serializers.CharField(required=False, allow_blank=True)
-    role = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email', 'phone', 'mfa_method', 'mfa_enabled', 'first_name', 'last_name', 'role')
+        fields = ('username', 'password', 'password2', 'email', 'mfa_method', 'mfa_enabled',)
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -40,19 +36,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        # Safely get first_name and last_name, providing defaults if not present
-        first_name = validated_data.get('first_name', '')
-        last_name = validated_data.get('last_name', '')
-        phone = validated_data.get('phone', '')
-        role = validated_data.get('role', 'User')
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
-            first_name=first_name,
-            last_name=last_name,
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
             is_active=False,
-            phone=phone,
-            role=role,
+            phone=validated_data['phone'],
+            role=validated_data['role']
         )
         user.set_password(validated_data['password'])
         user.save()
