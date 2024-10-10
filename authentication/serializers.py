@@ -10,23 +10,93 @@ from user.models import UserDevice
 User = get_user_model()
 
 
-# User Registration Serializer
+# # User Registration Serializer
+# class RegisterSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+#     password2 = serializers.CharField(write_only=True, required=True)
+
+#     class Meta:
+#         model = User
+#         fields = ('username', 'password', 'password2', 'email', 'mfa_method', 'mfa_enabled',)
+
+#     def validate(self, attrs):
+#         if attrs['password'] != attrs['password2']:
+#             raise serializers.ValidationError({"password": "Password fields didn't match."})
+        
+#         # Check for unique email and username
+#         if User.objects.filter(email=attrs['email']).exists():
+#             raise serializers.ValidationError({"email": "A user with that email already exists."})
+#         if User.objects.filter(username=attrs['username']).exists():
+#             raise serializers.ValidationError({"username": "A user with that username already exists."})
+        
+#         # Prevent admin and auditor roles from signing up
+#         if attrs.get('role') in ['ADMIN', 'AUDITOR']:  # Adjust as per your role constants
+#             raise serializers.ValidationError({"role": "Admin and Auditor roles cannot register."})
+        
+#         return attrs
+
+#     def create(self, validated_data):
+#         user = User.objects.create(
+#             username=validated_data['username'],
+#             email=validated_data['email'],
+#             first_name=validated_data['first_name'],
+#             last_name=validated_data['last_name'],
+#             is_active=False,
+#             phone=validated_data['phone'],
+#             role=validated_data['role']
+#         )
+#         user.set_password(validated_data['password'])
+#         user.save()
+
+#         # Send activation email
+#         send_activation_email(user)
+
+#         return user
+
+CHOICES = (
+    ("ADMIN", "Admin"),
+    ("USER", "User"),
+    ("LAWYER", "Lawyer"),
+    ("AUDITOR", "Auditor")
+)
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
+    first_name = serializers.CharField(required=False, allow_blank=True, default='')
+    last_name = serializers.CharField(required=False, allow_blank=True, default='')
+    phone = serializers.CharField(required=False, allow_blank=True, default='')
+    role = serializers.ChoiceField(choices=CHOICES, required=False, default='USER')
+    mfa_method = serializers.ChoiceField(
+        choices=[('email', 'Email'), ('sms', 'SMS'), ('totp', 'TOTP')],
+        required=False,
+        default='email'
+    )
+    mfa_enabled = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email', 'mfa_method', 'mfa_enabled',)
+        fields = (
+            'username',
+            'password',
+            'password2',
+            'email',
+            'mfa_method',
+            'mfa_enabled',
+            'first_name',
+            'last_name',
+            'phone',
+            'role',
+        )
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
+        if attrs.get('password') != attrs.get('password2'):
             raise serializers.ValidationError({"password": "Password fields didn't match."})
         
         # Check for unique email and username
-        if User.objects.filter(email=attrs['email']).exists():
+        if User.objects.filter(email=attrs.get('email')).exists():
             raise serializers.ValidationError({"email": "A user with that email already exists."})
-        if User.objects.filter(username=attrs['username']).exists():
+        if User.objects.filter(username=attrs.get('username')).exists():
             raise serializers.ValidationError({"username": "A user with that username already exists."})
         
         # Prevent admin and auditor roles from signing up
@@ -36,14 +106,27 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        # Remove password2 as it's not needed anymore
+        validated_data.pop('password2', None)
+
+        # Safely get optional fields with defaults
+        first_name = validated_data.get('first_name', '')
+        last_name = validated_data.get('last_name', '')
+        phone = validated_data.get('phone', '')
+        role = validated_data.get('role', 'USER')
+        mfa_method = validated_data.get('mfa_method', 'email')
+        mfa_enabled = validated_data.get('mfa_enabled', True)
+
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
+            first_name=first_name,
+            last_name=last_name,
             is_active=False,
-            phone=validated_data['phone'],
-            role=validated_data['role']
+            phone=phone,
+            role=role,
+            mfa_method=mfa_method,
+            mfa_enabled=mfa_enabled
         )
         user.set_password(validated_data['password'])
         user.save()
