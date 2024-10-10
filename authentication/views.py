@@ -154,14 +154,14 @@ class LinkedInCallbackView(APIView):
             user.set_unusable_password()
             user.save()
             
-            UserProfile.objects.create(
+            user_profile = UserProfile.objects.create(
                 user=user,
                 first_name=first_name,
                 last_name=last_name,
                 email=email,
                 profile_pic=profile_picture
              )
-            UserProfile.save()
+            user_profile.save()
 
         # Create JWT tokens
         refresh = RefreshToken.for_user(user)
@@ -169,7 +169,7 @@ class LinkedInCallbackView(APIView):
         #     'refresh': str(refresh),
         #     'access': str(refresh.access_token),
         # })
-        redirect_url = f"{settings.FRONTEND_BASE_URL}/linkendin-login?refresh={str(refresh)}&access={str(refresh.access_token)}"
+        redirect_url = f"{settings.FRONTEND_BASE_URL}/linkendin-login?email={str(email)}&access={str(refresh.access_token)}"
         return redirect(redirect_url)
 
     def get_access_token(self, code):
