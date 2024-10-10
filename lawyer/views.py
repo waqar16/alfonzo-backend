@@ -92,16 +92,17 @@ class CombinedDocumentsListAPIView(generics.ListAPIView):
         """
         Retrieve documents from both UserDocument and LawyerDocument where the current user is the selected lawyer.
         """
-        # Filter user documents where pdf_url is not empty
         user_documents = UserDocument.objects.filter(
             selected_lawyer__user=self.request.user,
-            pdf_url__isnull=False  # Ensure pdf_url is not null
+            pdf_url__isnull=False,  # Ensure pdf_url is not null
+            pdf_url__gt=''  # Ensure pdf_url is not an empty string
         )
 
-        # Filter lawyer documents where pdf_url is not empty
+        # Filter lawyer documents where pdf_url is not empty or null
         lawyer_documents = LawyerDocument.objects.filter(
             user=self.request.user,
-            pdf_url__isnull=False  # Ensure pdf_url is not null
+            pdf_url__isnull=False,  # Ensure pdf_url is not null
+            pdf_url__gt=''  # Ensure pdf_url is not an empty string
         )
 
         return user_documents, lawyer_documents  # Return both querysets separately
