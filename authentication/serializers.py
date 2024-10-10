@@ -153,19 +153,19 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         device_identifier = request.META.get('HTTP_USER_AGENT', '')
 
         user_obj = User.objects.filter(email=username_or_email).first() or User.objects.filter(username=username_or_email).first()
-
+        
         if user_obj:
+            if not user_obj.is_active:
+                # If the user is inactive, resend activation email
+                send_activation_email(user_obj)
+                raise serializers.ValidationError({
+                    "detail": "Your account is inactive. We've sent you a new activation email."
+                })
+
             # Authenticate with the username, even if email was entered
             user = authenticate(username=user_obj.username, password=password)
 
             if user:
-                if not user.is_active:
-                    # If the user is inactive, resend activation email
-                    send_activation_email(user)
-                    raise serializers.ValidationError({
-                        "detail": "Your account is inactive. We've sent you a new activation email."
-                    })
-
                 # Check device information
                 device_identifier = self.context['request'].META['HTTP_USER_AGENT']
                 device_exists = UserDevice.objects.filter(user=user, device_identifier=device_identifier).exists()
