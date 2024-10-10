@@ -36,60 +36,56 @@ class GoogleLoginAPIView(APIView):
         if not access_token:
             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            # Step 1: Verify the Google access token and get user info
-            google_user_info = get_google_user_info(access_token)
+        # Step 1: Verify the Google access token and get user info
+        google_user_info = get_google_user_info(access_token)
 
-            email = google_user_info.get('email')
-            first_name = google_user_info.get('given_name')
-            last_name = google_user_info.get('family_name')
-            profile_picture = google_user_info.get('picture')
+        email = google_user_info.get('email')
+        first_name = google_user_info.get('given_name')
+        last_name = google_user_info.get('family_name')
+        profile_picture = google_user_info.get('picture')
 
-            # Step 2: Check if the user exists in the database, if not create a new user
-            user = User.objects.get(email=email)
+        # Step 2: Check if the user exists in the database, if not create a new user
+        user = User.objects.get(email=email)
+    
+        if user:
+            if user.has_usable_password():
+                return Response(
+                    {"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            user = User.objects.create(
+                username=generate_unique_username(email.split('@')[0]),
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                is_active=True
+            )
+            user.set_unusable_password()
+            user.save()
             
-            if user:
-                if user.has_usable_password():
-                    return Response(
-                        {"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-            else:
-                user = User.objects.create(
-                    username=generate_unique_username(email.split('@')[0]),
-                    email=email,
-                    first_name=first_name,
-                    last_name=last_name,
-                    is_active=True
-                )
-                user.set_unusable_password()
-                user.save()
-             
-                user_profile = UserProfile.objects.create(
-                    user=user,
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    profile_pic=profile_picture
-                )
-                user_profile.save()
+            user_profile = UserProfile.objects.create(
+                user=user,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                profile_pic=profile_picture
+            )
+            user_profile.save()
 
-            # Step 3: Issue JWT token for the user
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-                "user": {
-                    "username": user.username,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "profile_picture": profile_picture
-                }
-            })
-
-        except Exception:
-            return Response({"error": "An error occurred please try again"}, status=status.HTTP_400_BAD_REQUEST)
+        # Step 3: Issue JWT token for the user
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "user": {
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "profile_picture": profile_picture
+            }
+        })
 
 
 # LinkedIn OAuth
