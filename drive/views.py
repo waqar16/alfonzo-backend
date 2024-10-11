@@ -66,7 +66,8 @@ class UploadPDFView(APIView):
 
 
 class SendEmailView(APIView):
-
+    permission_classes = [AllowAny]
+    
     def post(self, request, *args, **kwargs):
         try:
             # Extract data from the request body
