@@ -58,10 +58,10 @@ class GoogleLoginAPIView(APIView):
                 # Step 2: Check if the user exists in the database
                 try:
                     user = User.objects.get(email=email)
-                    
+           
                     # Check if the user has a usable password
                     if user.has_usable_password():
-                        return Response({"error": "It looks like your account is not linked with LinkedIn. Please login with the same email and password you set while creating the account."}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating the account."}, status=status.HTTP_400_BAD_REQUEST)
                 except ObjectDoesNotExist:
                     # User does not exist; create a new user
                     user = User.objects.create(
@@ -144,7 +144,7 @@ class LinkedInCallbackView(APIView):
             try:
                 user = User.objects.get(email=email)
                 if user.has_usable_password():
-                    Response({"error": "It looks like your account is not linked with Google. Please login with the same email and password you set while creating account."}, status=status.HTTP_400_BAD_REQUEST)
+                    Response({"error": "The email used in linkedIn is already in use. Please login with your password instead."}, status=status.HTTP_400_BAD_REQUEST)
 
             except User.DoesNotExist:
                 user = User.objects.create(
@@ -215,7 +215,6 @@ class LinkedInCallbackView(APIView):
             'profile_picture': userinfo_data.get('picture', ''),
             'locale': userinfo_data.get('locale', ''),
         }
-
 
 
 # LinkedIn Login
