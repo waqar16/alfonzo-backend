@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from user.models import UserProfile
 from lawyer.models import LawyerProfile
 from notification.models import Notification
+from user.models import UserDocument
+from lawyer.models import LawyerDocument
 
 User = get_user_model()
 
@@ -48,3 +50,16 @@ def create_notification(user_instance, title, message):
         title=title,
         message=message,
     )
+
+
+@receiver(post_save, sender=UserDocument)
+def create_notification_on_document_upload(sender, instance, created, **kwargs):
+    if created:
+        create_notification(instance.user, "Document Created Successfully", f"Your document has been created successfully.")
+
+
+
+@receiver(post_save, sender=LawyerDocument)
+def create_notification_on_document_upload(sender, instance, created, **kwargs):
+    if created:
+        create_notification(instance.user, "Document Created Successfully", f"Your document has been created successfully.")
