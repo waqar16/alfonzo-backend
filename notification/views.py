@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Notification
 from .serializers import NotificationSerializer
+from rest_framework.exceptions import NotFound
 
 
 class NotificationListView(generics.ListAPIView):
@@ -10,8 +11,21 @@ class NotificationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Return only notifications for the logged-in user
-        return Notification.objects.filter(user=self.request.user)
+        try:
+            # Return only notifications for the logged-in user
+            return Notification.objects.filter(user=self.request.user)
+        except Notification.DoesNotExist:
+            # Raise a NotFound exception if no notifications exist
+            raise NotFound("No notifications found for this user.")
+        except Exception as e:
+            # Handle any other unexpected errors
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def handle_exception(self, exc):
+        if isinstance(exc, NotFound):
+            return Response({'detail': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+        # Default behavior for other exceptions
+        return super().handle_exception(exc)
 
 
 class MarkNotificationReadView(generics.UpdateAPIView):
