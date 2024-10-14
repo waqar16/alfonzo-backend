@@ -11,6 +11,8 @@ from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from user.models import UserDocument
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, NotFound, ValidationError
 
 
 # Create a new lawyer profile (if it doesn't exist)
@@ -19,8 +21,11 @@ class LawyerProfileCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Automatically associate the authenticated user with the profile
-        serializer.save(user=self.request.user)
+        try:
+            # Automatically associate the authenticated user with the profile
+            serializer.save(user=self.request.user)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # Retrieve, update or delete a lawyer profile       
@@ -36,14 +41,24 @@ class LawyerProfileDetailUpdateView(generics.RetrieveUpdateAPIView):
         # Get the LawyerProfile for the authenticated user or raise 404
         return get_object_or_404(LawyerProfile, user=self.request.user)
 
+    def handle_exception(self, exc):
+        if isinstance(exc, PermissionDenied):
+            return Response({'error': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)
+        elif isinstance(exc, NotFound):
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        return super().handle_exception(exc)
+
 
 class LawyerProfileListView(generics.ListAPIView):
     serializer_class = LawyerProfileSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        # Return all lawyer profiles
-        return LawyerProfile.objects.all()
+        try:
+            # Return all lawyer profiles
+            return LawyerProfile.objects.all()
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LawyerDocumentListCreateAPIView(generics.ListCreateAPIView):
@@ -51,17 +66,30 @@ class LawyerDocumentListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Return only the documents created by the authenticated user
-        return LawyerDocument.objects.filter(user=self.request.user)
+        try:
+            # Return only the documents created by the authenticated user
+            return LawyerDocument.objects.filter(user=self.request.user)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)  # Set the user field to the authenticated user
+        try:
+            serializer.save(user=self.request.user)  # Set the user field to the authenticated user
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LawyerDocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = LawyerDocument.objects.all()
     serializer_class = LawyerDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def handle_exception(self, exc):
+        if isinstance(exc, NotFound):
+            return Response({'error': 'Document not found'}, status=status.HTTP_404_NOT_FOUND)
+        elif isinstance(exc, PermissionDenied):
+            return Response({'error': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)
+        return super().handle_exception(exc)
 
 
 class SendQueryToLawyerAPIView(generics.ListCreateAPIView):
@@ -70,7 +98,10 @@ class SendQueryToLawyerAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can send queries
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)  # Set the authenticated user as the sender
+        try:
+            serializer.save(user=self.request.user)  # Set the authenticated user as the sender
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LawyerUpdateVerificationAPIView(generics.UpdateAPIView):
@@ -79,37 +110,46 @@ class LawyerUpdateVerificationAPIView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Ensure the lawyer is authenticated
 
     def get_queryset(self):
-        """
-        Restrict the queryset to documents where the current user is the selected lawyer.
-        """
-        return LawyerDocument.objects.filter(selected_lawyer__user=self.request.user)
+        try:
+            """
+            Restrict the queryset to documents where the current user is the selected lawyer.
+            """
+            return LawyerDocument.objects.filter(selected_lawyer__user=self.request.user)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CombinedDocumentsListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Ensure the lawyer is authenticated
 
     def get_queryset(self):
-        """
-        Retrieve documents from both UserDocument and LawyerDocument where the current user is the selected lawyer.
-        """
-        user_documents = UserDocument.objects.filter(selected_lawyer__user=self.request.user)
-        lawyer_documents = LawyerDocument.objects.filter(user=self.request.user)  # Use user instead of lawyer
+        try:
+            """
+            Retrieve documents from both UserDocument and LawyerDocument where the current user is the selected lawyer.
+            """
+            user_documents = UserDocument.objects.filter(selected_lawyer__user=self.request.user)
+            lawyer_documents = LawyerDocument.objects.filter(user=self.request.user)  # Use user instead of lawyer
 
-        return user_documents, lawyer_documents  # Return both querysets separately
+            return user_documents, lawyer_documents  # Return both querysets separately
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request, *args, **kwargs):
-        user_documents, lawyer_documents = self.get_queryset()
+        try:
+            user_documents, lawyer_documents = self.get_queryset()
 
-        user_documents_data = UserDocumentListSerializer(user_documents, many=True).data
-        lawyer_documents_data = LawyerDocumentListSerializer(lawyer_documents, many=True).data
+            user_documents_data = UserDocumentListSerializer(user_documents, many=True).data
+            lawyer_documents_data = LawyerDocumentListSerializer(lawyer_documents, many=True).data
 
-        # Combine the data into a single response
-        combined_data = {
-            'user_documents': user_documents_data,
-            'lawyer_documents': lawyer_documents_data
-        }
+            # Combine the data into a single response
+            combined_data = {
+                'user_documents': user_documents_data,
+                'lawyer_documents': lawyer_documents_data
+            }
 
-        return Response(combined_data)
+            return Response(combined_data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_serializer_class(self):
         """

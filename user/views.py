@@ -1,6 +1,8 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from .models import UserProfile, UserDocument
 from .serializers import UserProfileSerializer, UserDocumentSerializer, LawyerVerificationUpdateSerializer
+from rest_framework.exceptions import PermissionDenied, NotFound, ValidationError
+from rest_framework.response import Response
 
 
 # Create a new user profile (if it doesn't exist)
@@ -9,19 +11,32 @@ class UserProfileCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Automatically associate the authenticated user with the profile
-        serializer.save(user=self.request.user)
+        try:
+            # Automatically associate the authenticated user with the profile
+            serializer.save(user=self.request.user)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # Ensure the user is authenticated and retrieve their own profile
 class UserProfileDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.AllowAny]
 
     def get_object(self):
-        # Return the user profile of the authenticated user
-        return UserProfile.objects.get(user=self.request.user)
+        try:
+            # Return the user profile of the authenticated user
+            return UserProfile.objects.get(user=self.request.user)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def handle_exception(self, exc):
+        if isinstance(exc, PermissionDenied):
+            return Response({'error': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)
+        elif isinstance(exc, NotFound):
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        return super().handle_exception(exc)
 
 
 class UserDocumentListCreateAPIView(generics.ListCreateAPIView):
@@ -29,17 +44,30 @@ class UserDocumentListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Return only the documents created by the authenticated user
-        return UserDocument.objects.filter(user=self.request.user)
+        try:
+            # Return only the documents created by the authenticated user
+            return UserDocument.objects.filter(user=self.request.user)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)  # Set the user field to the authenticated user
+        try:
+            serializer.save(user=self.request.user)  # Set the user field to the authenticated user
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserDocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserDocument.objects.all()
     serializer_class = UserDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def handle_exception(self, exc):
+        if isinstance(exc, NotFound):
+            return Response({'error': 'Document not found'}, status=status.HTTP_404_NOT_FOUND)
+        elif isinstance(exc, PermissionDenied):
+            return Response({'error': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)
+        return super().handle_exception(exc)
 
 
 class LawyerUpdateVerificationAPIView(generics.UpdateAPIView):
@@ -48,7 +76,10 @@ class LawyerUpdateVerificationAPIView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]  # Ensure the lawyer is authenticated
 
     def get_queryset(self):
-        """
-        Restrict the queryset to documents where the current user is the selected lawyer.
-        """
-        return UserDocument.objects.filter(selected_lawyer__user=self.request.user)
+        try:
+            """
+            Restrict the queryset to documents where the current user is the selected lawyer.
+            """
+            return UserDocument.objects.filter(selected_lawyer__user=self.request.user)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
