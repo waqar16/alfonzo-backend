@@ -25,8 +25,20 @@ class MarkNotificationReadView(generics.UpdateAPIView):
             notification.is_read = True
             notification.save()
             return Response({'status': 'Notification marked as read'}, status=status.HTTP_200_OK)
-        except Notification.DoesNotExist:
-            return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class MarkAllNotificationsReadView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            # Mark all notifications as read for the logged-in user
+            Notification.objects.filter(user=request.user).update(is_read=True)
+            return Response({'status': 'All notifications marked as read'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class DeleteNotificationView(generics.DestroyAPIView):
