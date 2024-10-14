@@ -17,11 +17,11 @@ class NotificationListView(generics.ListAPIView):
 class MarkNotificationReadView(generics.UpdateAPIView):
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
-    lookup_url_kwarg = 'id'
+    lookup_url_kwarg = 'notification_id'
 
     def update(self, request, *args, **kwargs):
         try:
-            notification = Notification.objects.get(id=kwargs['id'], user=request.user)
+            notification = Notification.objects.get(id=kwargs['notification_id'], user=request.user)
             notification.is_read = True
             notification.save()
             return Response({'status': 'Notification marked as read'}, status=status.HTTP_200_OK)
