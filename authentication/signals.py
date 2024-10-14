@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from user.models import UserProfile
 from lawyer.models import LawyerProfile
+from notification.models import Notification
 
 User = get_user_model()
 
@@ -20,6 +21,7 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
                 email=instance.email,
                 phone=instance.phone,
             )
+            create_notification(instance, "Profile created", f"Your user profile has been created successfully. Welcome {instance.first_name}!")
         elif instance.role == 'Lawyer':
             LawyerProfile.objects.create(
                 user=instance,
@@ -28,6 +30,8 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
                 email=instance.email,
                 phone=instance.phone,
             )
+            create_notification(instance, "Profile created", f"Your lawyer profile has been created successfully. Welcome {instance.first_name}!")
+
 
 # Automatically save the profile when the user is updated
 @receiver(post_save, sender=User)
@@ -36,3 +40,11 @@ def save_profile(sender, instance, **kwargs):
         instance.user_profile.save()
     elif instance.role == 'Lawyer' and hasattr(instance, 'lawyer_profile'):
         instance.lawyer_profile.save()
+
+
+def create_notification(user_instance, title, message):
+    Notification.objects.create(
+        user=user_instance,
+        title=title,
+        message=message,
+    )
