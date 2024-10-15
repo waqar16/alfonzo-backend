@@ -6,7 +6,7 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    sub_categoryies = models.TextField()
+    sub_categoryies = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
