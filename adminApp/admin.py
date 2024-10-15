@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Template, Category, SubCategory
+from .models import Template, Category
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
@@ -7,8 +7,4 @@ class TemplateAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-
-@admin.register(SubCategory)
-class SubCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category')
+    list_display = ('name', 'sub_categories')
