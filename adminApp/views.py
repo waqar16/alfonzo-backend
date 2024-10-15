@@ -1,5 +1,5 @@
 from authentication.serializers import UserSerializer
-from rest_framework import generics
+from rest_framework import generics, status
 from django.contrib.auth import get_user_model
 from .permissions import IsAdminSuperUserOrAuditor
 # from rest_framework.permissions import IsAdminSuperUserOrAuditor
@@ -11,6 +11,7 @@ from user.models import UserProfile
 from lawyer.models import LawyerProfile
 from .serializers import TemplateSerializer, CategorySerializer, SubCategorySerializer
 from django.db.models import Q
+from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -24,6 +25,17 @@ class CategoryListView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({"errors": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CategoryDetailView(generics.RetrieveAPIView):
