@@ -6,7 +6,7 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    sub_categories = models.TextField(null=True, blank=True)
+    sub_categories = models.JSONField(default=list)
 
     def __str__(self):
         return self.name
