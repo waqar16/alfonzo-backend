@@ -2,7 +2,7 @@ from authentication.serializers import UserSerializer
 from rest_framework import generics, status
 from django.contrib.auth import get_user_model
 from .permissions import IsAdminSuperUserOrAuditor
-# from rest_framework.permissions import IsAdminSuperUserOrAuditor
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count
@@ -95,7 +95,7 @@ class TemplateListView(generics.ListCreateAPIView):
             self.permission_classes = [IsAdminSuperUserOrAuditor]
         else:
             # Allow any user to list templates
-            self.permission_classes = [IsAdminSuperUserOrAuditor]
+            self.permission_classes = [IsAuthenticated]
 
         return super().get_permissions()
 
