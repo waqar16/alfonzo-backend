@@ -16,7 +16,8 @@ class TemplateAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
-    list_filter = ('name',)
+    list_filter = ('name', 'sub_categories')
+    search_fields = ('name',)
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('sub_categories')
