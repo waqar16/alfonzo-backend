@@ -54,6 +54,13 @@ class SubCategoryListView(generics.ListAPIView):
             return SubCategory.objects.filter(category_id=category_id)
         return SubCategory.objects.all()
 
+    def post(self, request):
+        serializer = SubCategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
 
 # List all users (admin only)
 class UserListView(generics.ListAPIView):
