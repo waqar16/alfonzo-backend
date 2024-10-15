@@ -23,6 +23,7 @@ class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 class CategoryDetailView(generics.RetrieveAPIView):
@@ -32,6 +33,7 @@ class CategoryDetailView(generics.RetrieveAPIView):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [AllowAny]
     # permission_classes = [IsAuthenticated]
 
 
@@ -44,6 +46,7 @@ class SubCategoryListView(generics.ListAPIView):
     """
     serializer_class = SubCategorySerializer
     # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         category_id = self.request.query_params.get('category')
