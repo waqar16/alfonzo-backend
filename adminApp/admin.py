@@ -5,7 +5,7 @@ from .models import Template, Category, SubCategory
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'questions', 'content')
-    list_filter = ('category', 'sub_category')
+    list_filter = ('category')
     search_fields = ('name', 'questions', 'content')
     readonly_fields = ('questions', 'content')
 
