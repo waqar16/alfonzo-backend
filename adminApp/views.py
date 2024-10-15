@@ -15,9 +15,10 @@ from django.db.models import Q
 User = get_user_model()
 
 
-class CategoryListView(generics.ListAPIView):
+class CategoryListView(generics.ListCreateAPIView):
     """
     GET /api/categories/
+    POST /api/categories/
     List all categories.
     """
     queryset = Category.objects.all()
