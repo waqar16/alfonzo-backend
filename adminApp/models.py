@@ -5,8 +5,8 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    sub_categories = models.JSONField(null=True, blank=True)
+    name = models.CharField(max_length=255)
+    sub_categories = models.JSONField(default=list)
 
     def __str__(self):
         return self.name
