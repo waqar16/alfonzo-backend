@@ -6,17 +6,18 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    sub_categoryies = models.TextField()
 
     def __str__(self):
         return self.name
 
 
-class SubCategory(models.Model):
-    category = models.ForeignKey(Category, related_name='sub_categories', on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+# class SubCategory(models.Model):
+#     category = models.ForeignKey(Category, related_name='sub_categories', on_delete=models.CASCADE)
+#     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 
 class Template(models.Model):

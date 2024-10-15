@@ -49,24 +49,6 @@ class CategoryDetailView(generics.RetrieveAPIView):
     # permission_classes = [IsAuthenticated]
 
 
-# 2. SubCategory Views
-
-class SubCategoryListView(generics.ListCreateAPIView):
-    """
-    GET /api/subcategories/?category=<category_id>
-    List subcategories filtered by category ID.
-    """
-    serializer_class = SubCategorySerializer
-    # permission_classes = [IsAuthenticated]
-    permission_classes = [IsAdminSuperUserOrAuditor]
-
-    def get_queryset(self):
-        category_id = self.request.query_params.get('category')
-        if category_id:
-            return SubCategory.objects.filter(category_id=category_id)
-        return SubCategory.objects.all()
-
-
 # List all users (admin only)
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
