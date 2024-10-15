@@ -10,7 +10,7 @@ class TemplateAdmin(admin.ModelAdmin):
     readonly_fields = ('questions', 'content')
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('category', 'sub_category')
+        return super().get_queryset(request).select_related('category',)
     
 
 @admin.register(Category)
