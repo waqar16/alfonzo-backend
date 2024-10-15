@@ -6,13 +6,50 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count
-from .models import Template
+from .models import Template, Category, SubCategory
 from user.models import UserProfile
 from lawyer.models import LawyerProfile
-from .serializers import TemplateSerializer
+from .serializers import TemplateSerializer, CategorySerializer, SubCategorySerializer
 from django.db.models import Q
 
 User = get_user_model()
+
+
+class CategoryListView(generics.ListAPIView):
+    """
+    GET /api/categories/
+    List all categories.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    # permission_classes = [IsAuthenticated]
+
+
+class CategoryDetailView(generics.RetrieveAPIView):
+    """
+    GET /api/categories/<int:pk>/
+    Retrieve a specific category.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    # permission_classes = [IsAuthenticated]
+
+
+# 2. SubCategory Views
+
+class SubCategoryListView(generics.ListAPIView):
+    """
+    GET /api/subcategories/?category=<category_id>
+    List subcategories filtered by category ID.
+    """
+    serializer_class = SubCategorySerializer
+    # permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        category_id = self.request.query_params.get('category')
+        if category_id:
+            return SubCategory.objects.filter(category_id=category_id)
+        return SubCategory.objects.all()
 
 
 # List all users (admin only)
