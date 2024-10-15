@@ -39,7 +39,7 @@ class CategoryDetailView(generics.RetrieveAPIView):
 
 # 2. SubCategory Views
 
-class SubCategoryListView(generics.ListAPIView):
+class SubCategoryListView(generics.ListCreateAPIView):
     """
     GET /api/subcategories/?category=<category_id>
     List subcategories filtered by category ID.
@@ -54,12 +54,12 @@ class SubCategoryListView(generics.ListAPIView):
             return SubCategory.objects.filter(category_id=category_id)
         return SubCategory.objects.all()
 
-    def post(self, request):
-        serializer = SubCategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    # def post(self, request):
+    #     serializer = SubCategorySerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=201)
+    #     return Response(serializer.errors, status=400)
 
 
 # List all users (admin only)
