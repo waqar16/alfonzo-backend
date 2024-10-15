@@ -2,7 +2,7 @@ from authentication.serializers import UserSerializer
 from rest_framework import generics
 from django.contrib.auth import get_user_model
 from .permissions import IsAdminSuperUserOrAuditor
-from rest_framework.permissions import AllowAny
+# from rest_framework.permissions import IsAdminSuperUserOrAuditor
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count
@@ -23,7 +23,7 @@ class CategoryListView(generics.ListCreateAPIView):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminSuperUserOrAuditor]
 
 
 class CategoryDetailView(generics.RetrieveAPIView):
@@ -33,7 +33,7 @@ class CategoryDetailView(generics.RetrieveAPIView):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminSuperUserOrAuditor]
     # permission_classes = [IsAuthenticated]
 
 
@@ -46,7 +46,7 @@ class SubCategoryListView(generics.ListCreateAPIView):
     """
     serializer_class = SubCategorySerializer
     # permission_classes = [IsAuthenticated]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminSuperUserOrAuditor]
 
     def get_queryset(self):
         category_id = self.request.query_params.get('category')
@@ -58,7 +58,7 @@ class SubCategoryListView(generics.ListCreateAPIView):
 # List all users (admin only)
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminSuperUserOrAuditor]
 
     def get_queryset(self):
         # Get role from query params
@@ -97,10 +97,10 @@ class TemplateListView(generics.ListCreateAPIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             # Only admins can create templates
-            self.permission_classes = [AllowAny]
+            self.permission_classes = [IsAdminSuperUserOrAuditor]
         else:
             # Allow any user to list templates
-            self.permission_classes = [AllowAny]
+            self.permission_classes = [IsAdminSuperUserOrAuditor]
 
         return super().get_permissions()
 
@@ -110,7 +110,7 @@ class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
     # permission_classes = [IsAdminSuperUserOrAuditor]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminSuperUserOrAuditor]
 
 
 class UserActivityOverview(APIView):
