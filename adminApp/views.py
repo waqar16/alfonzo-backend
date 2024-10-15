@@ -6,10 +6,10 @@ from .permissions import IsAdminSuperUserOrAuditor
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count
-from .models import Template, Category, SubCategory
+from .models import Template, Category
 from user.models import UserProfile
 from lawyer.models import LawyerProfile
-from .serializers import TemplateSerializer, CategorySerializer, SubCategorySerializer
+from .serializers import TemplateSerializer, CategorySerializer
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 
