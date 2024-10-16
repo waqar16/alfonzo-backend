@@ -107,7 +107,7 @@ class TemplateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.category = validated_data.get('category', instance.category)
-        instance.SubCategory = validated_data.get('sub_category', instance.SubCategory)
+        instance.sub_category = validated_data.get('sub_category', instance.SubCategory)
         instance.questions = validated_data.get('questions', instance.questions)
         instance.content = validated_data.get('content', instance.content)
         instance.save()
