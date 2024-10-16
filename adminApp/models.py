@@ -31,7 +31,7 @@ class SubCategory(models.Model):
 class Template(models.Model):
     name = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    SubCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    SubCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True, blank=True)
     questions = models.JSONField(null=True, blank=True)
     content = models.TextField(null=True, blank=True)
 
