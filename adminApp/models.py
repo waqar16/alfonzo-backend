@@ -31,7 +31,7 @@ class Template(models.Model):
     SubCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True, blank=True)
     questions = models.JSONField(null=True, blank=True)
     content = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.name
