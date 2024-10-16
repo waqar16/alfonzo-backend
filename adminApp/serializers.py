@@ -43,4 +43,4 @@ class TemplateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Template
-        fields = ['id', 'name', 'category', 'SubCategory', 'questions', 'content']
+        fields = ['id', 'name', 'category', 'SubCategory', 'questions', 'content', 'created_at', 'updated_at']
