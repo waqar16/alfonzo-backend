@@ -104,7 +104,7 @@ class TemplateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Extract category and sub_category IDs
         category_id = validated_data.pop('category')
-        sub_category_id = validated_data.pop('SubCategory', None)
+        sub_category_id = validated_data.pop('sub_category', None)  # Correcting to 'sub_category'
 
         # Retrieve the Category and SubCategory instances
         validated_data['category'] = Category.objects.get(id=category_id)
@@ -116,7 +116,7 @@ class TemplateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.category = validated_data.get('category', instance.category)
-        instance.SubCategory = validated_data.get('sub_category', instance.SubCategory)
+        instance.SubCategory = validated_data.get('sub_category', instance.SubCategory)  # Correcting to 'sub_category'
         instance.questions = validated_data.get('questions', instance.questions)
         instance.content = validated_data.get('content', instance.content)
         instance.save()
@@ -124,6 +124,14 @@ class TemplateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['category'] = instance.category.id  # Only return ID
-        representation['sub_category'] = instance.SubCategory.id if instance.SubCategory else None  # Only return ID
+        # Include complete category and sub_category objects
+        representation['category'] = {
+            'id': instance.category.id,
+            'name': instance.category.name,
+            'sub_categories': [{'id': sub.id, 'name': sub.name} for sub in instance.category.sub_categories.all()]
+        }
+        representation['sub_category'] = {
+            'id': instance.SubCategory.id,
+            'name': instance.SubCategory.name
+        } if instance.SubCategory else None
         return representation
