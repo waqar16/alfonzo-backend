@@ -96,6 +96,16 @@ class TemplateListCreateView(generics.ListCreateAPIView):
     """
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
+    pagination_class = None  # Initially set to None
+
+    def get_paginator(self):
+        """
+        Override the default paginator to allow disabling pagination via query param.
+        """
+        paginate = self.request.query_params.get('paginate', 'true').lower()
+        if paginate == 'false':
+            return None  # Disable pagination
+        return super().get_paginator()  # Use default pagination
     
     def get_queryset(self):
         queryset = super().get_queryset()
