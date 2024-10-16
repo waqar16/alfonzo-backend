@@ -40,22 +40,39 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TemplateSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-    SubCategory = SubCategorySerializer()
+    category_id = serializers.IntegerField(source='category.id')
+    sub_category_id = serializers.IntegerField(source='SubCategory.id')
 
     class Meta:
         model = Template
-        fields = ['id', 'name', 'category', 'SubCategory', 'questions', 'content', 'created_at']
+        fields = ['id', 'name', 'category_id', 'sub_category_id', 'questions', 'content', 'created_at']
 
     def create(self, validated_data):
-        return Template.objects.create(**validated_data)
+        # Extract category and subcategory IDs
+        category_id = validated_data.pop('category')['id']
+        sub_category_id = validated_data.pop('SubCategory')['id']
+        
+        # Retrieve the Category and SubCategory instances
+        category = Category.objects.get(id=category_id)
+        sub_category = SubCategory.objects.get(id=sub_category_id)
+
+        # Create the Template instance with the retrieved instances
+        template = Template.objects.create(category=category, SubCategory=sub_category, **validated_data)
+        
+        return template
 
     def update(self, instance, validated_data):
+        # Similar logic as create to retrieve Category and SubCategory
+        category_id = validated_data.get('category', {}).get('id', instance.category.id)
+        sub_category_id = validated_data.get('SubCategory', {}).get('id', instance.SubCategory.id)
+
         instance.name = validated_data.get('name', instance.name)
-        instance.category = validated_data.get('category', instance.category)
-        instance.SubCategory = validated_data.get('SubCategory', instance.SubCategory)
         instance.questions = validated_data.get('questions', instance.questions)
         instance.content = validated_data.get('content', instance.content)
+
+        # Retrieve and set the Category and SubCategory instances
+        instance.category = Category.objects.get(id=category_id)
+        instance.SubCategory = SubCategory.objects.get(id=sub_category_id)
+
         instance.save()
         return instance
-    
