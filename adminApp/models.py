@@ -21,9 +21,6 @@ class SubCategory(models.Model):
     category = models.ForeignKey(Category, related_name='sub_categories', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
-    class Meta:
-        unique_together = ('category', 'name')  # Ensure unique subcategory per category.
-
     def __str__(self):
         return f"{self.name} ({self.category.name})"
 

@@ -96,6 +96,23 @@ class TemplateListCreateView(generics.ListCreateAPIView):
     """
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # Get query parameters
+        category_name = self.request.query_params.get('category', None)
+        sub_category_name = self.request.query_params.get('sub_category', None)
+
+        # Filter based on category name
+        if category_name:
+            queryset = queryset.filter(category__name__icontains=category_name)
+
+        # Filter based on sub-category name
+        if sub_category_name:
+            queryset = queryset.filter(SubCategory__name__icontains=sub_category_name)
+
+        return queryset
 
     # Define custom permission classes
     def get_permissions(self):
