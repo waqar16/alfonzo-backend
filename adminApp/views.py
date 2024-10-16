@@ -20,6 +20,7 @@ class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminSuperUserOrAuditor]
+    pagination_class = None
 
 # class CategoryListView(generics.ListCreateAPIView):
 #     """
