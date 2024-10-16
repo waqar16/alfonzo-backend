@@ -40,45 +40,22 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TemplateSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), write_only=True)
-    SubCategory = serializers.PrimaryKeyRelatedField(queryset=SubCategory.objects.all(), write_only=True)
+    category = CategorySerializer()
+    SubCategory = SubCategorySerializer()
 
     class Meta:
         model = Template
         fields = ['id', 'name', 'category', 'SubCategory', 'questions', 'content', 'created_at']
-        read_only_fields = ['created_at']
-
-    def to_representation(self, instance):
-        # Customize the output for GET requests
-        representation = super().to_representation(instance)
-        representation['category'] = CategorySerializer(instance.category).data
-        representation['SubCategory'] = SubCategorySerializer(instance.SubCategory).data
-        return representation
 
     def create(self, validated_data):
-        # Extract category and subcategory IDs
-        category_id = validated_data.pop('category')
-        subcategory_id = validated_data.pop('SubCategory')
-        
-        # Get the actual instances
-        validated_data['category'] = Category.objects.get(id=category_id)
-        validated_data['SubCategory'] = SubCategory.objects.get(id=subcategory_id)
-        
         return Template.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        # Extract category and subcategory IDs
-        category_id = validated_data.pop('category', None)
-        subcategory_id = validated_data.pop('SubCategory', None)
-
-        # Update only if provided
-        if category_id is not None:
-            instance.category = Category.objects.get(id=category_id)
-        if subcategory_id is not None:
-            instance.SubCategory = SubCategory.objects.get(id=subcategory_id)
-
         instance.name = validated_data.get('name', instance.name)
+        instance.category = validated_data.get('category', instance.category)
+        instance.SubCategory = validated_data.get('SubCategory', instance.SubCategory)
         instance.questions = validated_data.get('questions', instance.questions)
         instance.content = validated_data.get('content', instance.content)
         instance.save()
         return instance
+    
