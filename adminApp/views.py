@@ -125,22 +125,22 @@ class TemplateListCreateView(generics.ListCreateAPIView):
 
         return super().get_permissions()
 
-    def get(self, request, *args, **kwargs):
-        """
-        Get a list of all templates.
-        """
-        templates = self.get_queryset()
-        serializer = self.get_serializer(templates, many=True)
-        return Response(serializer.data)
+    # def get(self, request, *args, **kwargs):
+    #     """
+    #     Get a list of all templates.
+    #     """
+    #     templates = self.get_queryset()
+    #     serializer = self.get_serializer(templates, many=True)
+    #     return Response(serializer.data)
 
-    def post(self, request, *args, **kwargs):
-        """
-        Create a new template.
-        """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        template = serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # def post(self, request, *args, **kwargs):
+    #     """
+    #     Create a new template.
+    #     """
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     template = serializer.save()
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
