@@ -89,7 +89,10 @@ class UserDeleteView(generics.DestroyAPIView):
 
 
 # List and create templates (admin only)
-class TemplateListView(generics.ListCreateAPIView):
+class TemplateListCreateView(generics.ListCreateAPIView):
+    """
+    API view to list and create templates.
+    """
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
 
@@ -104,13 +107,59 @@ class TemplateListView(generics.ListCreateAPIView):
 
         return super().get_permissions()
 
+    def get(self, request, *args, **kwargs):
+        """
+        Get a list of all templates.
+        """
+        templates = self.get_queryset()
+        serializer = self.get_serializer(templates, many=True)
+        return Response(serializer.data)
 
-# Retrieve, update, or delete a specific template (admin only)
+    def post(self, request, *args, **kwargs):
+        """
+        Create a new template.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        template = serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class TemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view to retrieve, update or delete a template.
+    """
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
-    # permission_classes = [IsAdminSuperUserOrAuditor]
-    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    # Allow authenticated users for all methods
+    permission_classes = [IsAuthenticated]  # Adjust permissions as needed
+
+    def get(self, request, *args, **kwargs):
+        """
+        Retrieve a specific template.
+        """
+        template = self.get_object()
+        serializer = self.get_serializer(template)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        """
+        Update a specific template.
+        """
+        template = self.get_object()
+        serializer = self.get_serializer(template, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        updated_template = serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Delete a specific template.
+        """
+        template = self.get_object()
+        template.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserActivityOverview(APIView):
