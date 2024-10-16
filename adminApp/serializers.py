@@ -102,23 +102,28 @@ class TemplateSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'category', 'sub_category', 'questions', 'content', 'created_at']
 
     def create(self, validated_data):
+        # Extract category and sub_category IDs
+        category_id = validated_data.pop('category')
+        sub_category_id = validated_data.pop('SubCategory', None)
+
+        # Retrieve the Category and SubCategory instances
+        validated_data['category'] = Category.objects.get(id=category_id)
+        if sub_category_id:
+            validated_data['SubCategory'] = SubCategory.objects.get(id=sub_category_id)
+
         return Template.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.category = validated_data.get('category', instance.category)
-        instance.sub_category = validated_data.get('sub_category', instance.SubCategory)
+        instance.SubCategory = validated_data.get('sub_category', instance.SubCategory)
         instance.questions = validated_data.get('questions', instance.questions)
         instance.content = validated_data.get('content', instance.content)
         instance.save()
         return instance
 
     def to_representation(self, instance):
-        """
-        Customize the output representation of the Template instance.
-        """
         representation = super().to_representation(instance)
-        # Optionally, remove fields or modify them as needed
         representation['category'] = instance.category.id  # Only return ID
         representation['sub_category'] = instance.SubCategory.id if instance.SubCategory else None  # Only return ID
         return representation
