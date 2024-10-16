@@ -16,23 +16,20 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'sub_categories']
 
     def create(self, validated_data):
-        # Extract subcategories data
         sub_categories_data = validated_data.pop('sub_categories', [])
-        # Create the category first
         category = Category.objects.create(**validated_data)
-        # Create subcategories linked to the category
+        
         for sub_category_data in sub_categories_data:
             SubCategory.objects.create(category=category, **sub_category_data)
         return category
 
     def update(self, instance, validated_data):
-        # Clear subcategories and re-create (or update accordingly)
         sub_categories_data = validated_data.pop('sub_categories', [])
         instance.name = validated_data.get('name', instance.name)
         instance.save()
 
-        # Optionally handle updating subcategories
-        instance.sub_categories.all().delete()  # Clear old subcategories
+        # Clear old subcategories and create new ones
+        instance.sub_categories.all().delete()
         for sub_category_data in sub_categories_data:
             SubCategory.objects.create(category=instance, **sub_category_data)
 
