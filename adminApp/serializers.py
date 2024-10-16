@@ -94,22 +94,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TemplateSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-    sub_category = serializers.PrimaryKeyRelatedField(queryset=SubCategory.objects.all(), source='SubCategory')
-
     class Meta:
         model = Template
         fields = ['id', 'name', 'category', 'sub_category', 'questions', 'content', 'created_at']
-
-    def create(self, validated_data):
-        return Template.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.category = validated_data.get('category', instance.category)
-        # Correct the assignment for SubCategory
-        instance.SubCategory = validated_data.get('sub_category', instance.SubCategory)
-        instance.questions = validated_data.get('questions', instance.questions)
-        instance.content = validated_data.get('content', instance.content)
-        instance.save()
-        return instance
