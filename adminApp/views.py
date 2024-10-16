@@ -16,38 +16,43 @@ from rest_framework.exceptions import ValidationError
 User = get_user_model()
 
 
-class CategoryListView(generics.ListCreateAPIView):
-    """
-    GET /api/categories/
-    POST /api/categories/
-    List all categories and create a new category with subcategories.
-    """
+class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminSuperUserOrAuditor]
-    pagination_class = None
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except ValidationError as e:
-            return Response({"errors": e.detail}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# class CategoryListView(generics.ListCreateAPIView):
+#     """
+#     GET /api/categories/
+#     POST /api/categories/
+#     List all categories and create a new category with subcategories.
+#     """
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
+#     permission_classes = [IsAdminSuperUserOrAuditor]
+#     pagination_class = None
+
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         try:
+#             serializer.is_valid(raise_exception=True)
+#             self.perform_create(serializer)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         except ValidationError as e:
+#             return Response({"errors": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class CategoryDetailView(generics.RetrieveAPIView):
-    """
-    GET /api/categories/<int:pk>/
-    Retrieve a specific category.
-    """
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsAdminSuperUserOrAuditor]
-    # permission_classes = [IsAuthenticated]
+# class CategoryDetailView(generics.RetrieveAPIView):
+#     """
+#     GET /api/categories/<int:pk>/
+#     Retrieve a specific category.
+#     """
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
+#     permission_classes = [IsAdminSuperUserOrAuditor]
+#     # permission_classes = [IsAuthenticated]
 
 
 # List all users (admin only)

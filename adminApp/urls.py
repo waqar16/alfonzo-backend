@@ -11,13 +11,13 @@ from .views import (
     MostUsedTemplatesByLawyer,
     TemplateListView,
     TemplateDetailView,
-    CategoryListView,
-    CategoryDetailView,
+    CategoryListCreateView,
+    # CategoryDetailView,
 )
 
 urlpatterns = [
-    path('categories/', CategoryListView.as_view(), name='category-list'),
-    path('categories/<int:pk>/', CategoryDetailView.as_view(), name='category-detail'),
+    path('categories/', CategoryListCreateView.as_view(), name='category-list'),
+    # path('categories/<int:pk>/', CategoryDetailView.as_view(), name='category-detail'),
     path('users/', UserListView.as_view(), name='user-list'),
     path('users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
     path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user-delete'),

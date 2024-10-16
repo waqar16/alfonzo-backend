@@ -5,11 +5,27 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
-    sub_categories = models.JSONField(default=list)
+    """
+    A model representing the main category.
+    """
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return self.name
+
+
+class SubCategory(models.Model):
+    """
+    A model representing subcategories, linked to Category via a ForeignKey.
+    """
+    category = models.ForeignKey(Category, related_name='sub_categories', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = ('category', 'name')  # Ensure unique subcategory per category.
+
+    def __str__(self):
+        return f"{self.name} ({self.category.name})"
 
 
 class Template(models.Model):
