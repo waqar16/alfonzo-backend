@@ -9,7 +9,7 @@ from .views import (
     TemplateOverview,
     MostUsedTemplatesByUser,
     MostUsedTemplatesByLawyer,
-    TemplateListView,
+    TemplateListCreateView,
     TemplateDetailView,
     CategoryListCreateView,
     # CategoryDetailView,
@@ -26,6 +26,6 @@ urlpatterns = [
     path('analytics/templates-overview/', TemplateOverview.as_view(), name='template-overview'),
     path('analytics/most-used-templates-by-user/', MostUsedTemplatesByUser.as_view(), name='most-used-templates-by-user'),
     path('analytics/most-used-templates-by-lawyer/', MostUsedTemplatesByLawyer.as_view(), name='most-used-templates-by-lawyer'),
-    path('templates/', TemplateListView.as_view(), name='template-list-create'),
+    path('templates/', TemplateListCreateView.as_view(), name='template-list-create'),
     path('templates/<int:pk>/', TemplateDetailView.as_view(), name='template-detail'),
 ]
