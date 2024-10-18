@@ -11,9 +11,28 @@ from user.models import UserProfile
 from lawyer.models import LawyerProfile
 from .serializers import TemplateSerializer, CategorySerializer
 from django.db.models import Q
-from rest_framework.exceptions import ValidationError
+from user.models import UserDocument
+from lawyer.models import LawyerDocument
+from .serializers import UserDocumentsListSerializer, LawyerDocumentsListSerializer
+from rest_framework import viewsets
 
 User = get_user_model()
+
+
+class DocumentsViewSet(viewsets.ViewSet):
+    permission_classes = [IsAdminSuperUserOrAuditor]
+
+    def list(self, request):
+        user_documents = UserDocument.objects.all()
+        lawyer_documents = LawyerDocument.objects.all()
+
+        user_documents_serialized = UserDocumentsListSerializer(user_documents, many=True).data
+        lawyer_documents_serialized = LawyerDocumentsListSerializer(lawyer_documents, many=True).data
+
+        return Response({
+            'user_documents': user_documents_serialized,
+            'lawyer_documents': lawyer_documents_serialized
+        })
 
 
 class CategoryListCreateView(generics.ListCreateAPIView):

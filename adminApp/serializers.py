@@ -58,6 +58,20 @@
 
 from rest_framework import serializers
 from .models import Template, Category, SubCategory
+from user.models import UserDocument
+from lawyer.models import LawyerDocument
+
+
+class UserDocumentsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDocument
+        field = '__all__'
+  
+
+class LawyerDocumentsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LawyerDocument
+        field = '__all__'
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
