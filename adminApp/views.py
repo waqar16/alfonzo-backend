@@ -19,13 +19,13 @@ User = get_user_model()
 
 
 class DocumentsListView(generics.ListAPIView):
-    permission_classes = [IsAdminSuperUserOrAuditor]  # Replace with your permission class
-    serializer_class = None  # No single serializer class in use
+    permission_classes = [IsAdminSuperUserOrAuditor] 
 
-    def get(self, request, *args, **kwargs):
+    def get_queryset(self):
+        # Combine both querysets and return a single queryset
         user_documents = UserDocument.objects.all()
         lawyer_documents = LawyerDocument.objects.all()
-
+        
         # Serialize each queryset according to its type
         serialized_user_documents = UserDocumentsListSerializer(user_documents, many=True).data
         serialized_lawyer_documents = LawyerDocumentsListSerializer(lawyer_documents, many=True).data
@@ -33,9 +33,16 @@ class DocumentsListView(generics.ListAPIView):
         # Combine serialized data into one response list
         combined_serialized = serialized_user_documents + serialized_lawyer_documents
 
-        return Response({
-            'documents': combined_serialized  # Single unified response
-        })
+        return combined_serialized  # Return the combined data for pagination
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            return self.get_paginated_response(page)
+
+        return Response(queryset)
 
 
 class CategoryListCreateView(generics.ListCreateAPIView):
