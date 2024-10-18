@@ -14,24 +14,27 @@ from django.db.models import Q
 from user.models import UserDocument
 from lawyer.models import LawyerDocument
 from .serializers import UserDocumentsListSerializer, LawyerDocumentsListSerializer
-from rest_framework import viewsets
 
 User = get_user_model()
 
 
-class DocumentsViewSet(viewsets.ViewSet):
-    permission_classes = [IsAdminSuperUserOrAuditor]
+class DocumentsListView(generics.GenericAPIView):
+    permission_classes = [IsAdminSuperUserOrAuditor]  # Replace with your permission class
+    serializer_class = None  # No single serializer class in use
 
-    def list(self, request):
+    def get(self, request, *args, **kwargs):
         user_documents = UserDocument.objects.all()
         lawyer_documents = LawyerDocument.objects.all()
 
-        user_documents_serialized = UserDocumentsListSerializer(user_documents, many=True).data
-        lawyer_documents_serialized = LawyerDocumentsListSerializer(lawyer_documents, many=True).data
+        # Serialize each queryset according to its type
+        serialized_user_documents = UserDocumentsListSerializer(user_documents, many=True).data
+        serialized_lawyer_documents = LawyerDocumentsListSerializer(lawyer_documents, many=True).data
+
+        # Combine serialized data into one response list
+        combined_serialized = serialized_user_documents + serialized_lawyer_documents
 
         return Response({
-            'user_documents': user_documents_serialized,
-            'lawyer_documents': lawyer_documents_serialized
+            'documents': combined_serialized  # Single unified response
         })
 
 
