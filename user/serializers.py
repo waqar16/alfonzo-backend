@@ -11,7 +11,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDocument
-        fields = ['id', 'selected_lawyer', 'title', 'base64_content', 'pdf_url', 'template', 'verification_status']
+        fields = ['id', 'selected_lawyer', 'title', 'base64_content', 'content', 'pdf_url', 'template', 'verification_status']
         # We don't include 'user' here because we handle it in the view
 
     def create(self, validated_data):
