@@ -245,14 +245,13 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        try:
-            serializer = RegisterSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 # Custom Token View for JWT login
@@ -260,37 +259,34 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data, context={'request': request})
-            serializer.is_valid(raise_exception=True)
-            validated_data = serializer.validated_data
+        serializer = self.get_serializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
 
-            # Check if MFA is required and return an appropriate response
-            if validated_data.get('mfa_required'):
-                # Get the user object from the validated_data (user_obj from serializer)
-                user = validated_data.get('user')
-                if user:
-                    email = user.email
-                    username = user.username
-                    first_name = user.first_name
-                    last_name = user.last_name
-                    return Response({
-                        'message': validated_data['message'],
-                        'mfa_required': True,
-                        'email': email,
-                        'username': username,
-                        'first_name': first_name,
-                        'last_name': last_name
-                    }, status=status.HTTP_200_OK)
-                else:
-                    return Response({
-                        'detail': 'User data is missing.'
-                    }, status=status.HTTP_400_BAD_REQUEST)
+        # Check if MFA is required and return an appropriate response
+        if validated_data.get('mfa_required'):
+            # Get the user object from the validated_data (user_obj from serializer)
+            user = validated_data.get('user')
+            if user:
+                email = user.email
+                username = user.username
+                first_name = user.first_name
+                last_name = user.last_name
+                return Response({
+                    'message': validated_data['message'],
+                    'mfa_required': True,
+                    'email': email,
+                    'username': username,
+                    'first_name': first_name,
+                    'last_name': last_name
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'detail': 'User data is missing.'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Return JWT tokens and user info if authentication is successful
-            return Response(validated_data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Return JWT tokens and user info if authentication is successful
+        return Response(validated_data, status=status.HTTP_200_OK)
 
 
 class LogoutView(APIView):
