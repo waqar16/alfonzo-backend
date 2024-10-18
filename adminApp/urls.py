@@ -29,5 +29,5 @@ urlpatterns = [
     path('analytics/most-used-templates-by-lawyer/', MostUsedTemplatesByLawyer.as_view(), name='most-used-templates-by-lawyer'),
     path('templates/', TemplateListCreateView.as_view(), name='template-list-create'),
     path('templates/<int:pk>/', TemplateDetailView.as_view(), name='template-detail'),
-    path('all-created-documents/', DocumentsListView.as_view({'get': 'list'}), name='admin-documents'),
+    path('all-created-documents/', DocumentsListView.as_view(), name='admin-documents'),
 ]

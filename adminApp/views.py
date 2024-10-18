@@ -18,7 +18,7 @@ from .serializers import UserDocumentsListSerializer, LawyerDocumentsListSeriali
 User = get_user_model()
 
 
-class DocumentsListView(generics.GenericAPIView):
+class DocumentsListView(generics.ListAPIView):
     permission_classes = [IsAdminSuperUserOrAuditor]  # Replace with your permission class
     serializer_class = None  # No single serializer class in use
 
