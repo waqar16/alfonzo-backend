@@ -39,7 +39,7 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
         self.perform_update(serializer)
 
         return Response(serializer.data)
-    
+
     def put(self, request, *args, **kwargs):
         # Handle PUT request for updating the UserProfile
         instance = self.get_object()
