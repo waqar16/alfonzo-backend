@@ -588,7 +588,7 @@ class VerifyMFAView(APIView):
 class DeleteUserView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def delete(self, request):
         try:
             user = request.user
             user.delete()
