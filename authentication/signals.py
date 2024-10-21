@@ -20,6 +20,7 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
                 user=instance,
                 first_name=instance.first_name,
                 last_name=instance.last_name,
+                username=instance.username,
                 email=instance.email,
                 phone=instance.phone,
             )
@@ -29,6 +30,7 @@ def create_profile_based_on_role(sender, instance, created, **kwargs):
                 user=instance,
                 first_name=instance.first_name,
                 last_name=instance.last_name,
+                username=instance.username,
                 email=instance.email,
                 phone=instance.phone,
             )

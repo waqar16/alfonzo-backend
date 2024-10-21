@@ -79,6 +79,7 @@ class GoogleLoginAPIView(APIView):
                         user=user,
                         first_name=first_name,
                         last_name=last_name,
+                        username=user.username,
                         email=email,
                         profile_pic=profile_picture
                     )
@@ -161,6 +162,7 @@ class LinkedInCallbackView(APIView):
                     user=user,
                     first_name=first_name,
                     last_name=last_name,
+                    username=user.username,
                     email=email,
                     profile_pic=profile_picture
                 )
