@@ -41,6 +41,24 @@ class LawyerProfileDetailUpdateView(generics.RetrieveUpdateAPIView):
         # Get the LawyerProfile for the authenticated user or raise 404
         return get_object_or_404(LawyerProfile, user=self.request.user)
 
+    def patch(self, request, *args, **kwargs):
+        # Handle PATCH request for updating the LawyerProfile
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+    
+    def put(self, request, *args, **kwargs):
+        # Handle PUT request for updating the LawyerProfile
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
     def handle_exception(self, exc):
         if isinstance(exc, PermissionDenied):
             return Response({'error': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)

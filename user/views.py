@@ -31,6 +31,24 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def patch(self, request, *args, **kwargs):
+        # Handle PATCH request for updating the UserProfile
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+    
+    def put(self, request, *args, **kwargs):
+        # Handle PUT request for updating the UserProfile
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
     def handle_exception(self, exc):
         if isinstance(exc, PermissionDenied):
             return Response({'error': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)

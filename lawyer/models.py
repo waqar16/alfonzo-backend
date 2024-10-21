@@ -8,7 +8,7 @@ User = get_user_model()
 class LawyerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lawyer_profile')
     first_name = models.CharField(max_length=255, null=True, blank=True)
-    last_name = models.CharField(max_length=255,null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=255, null=True, blank=True)
     profile_pic = models.URLField(null=True, blank=True)

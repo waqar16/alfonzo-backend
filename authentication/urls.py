@@ -17,6 +17,7 @@ from .views import (
     ChangeUsernameView,
     AuthGuardView,
     ResendActivationEmailView,
+    DeleteUserView,
 )
 
 urlpatterns = [
@@ -37,4 +38,5 @@ urlpatterns = [
     path('change-username/', ChangeUsernameView.as_view(), name='change_username'),
     path('auth-guard/', AuthGuardView.as_view(), name='auth_guard'),
     path('resend-activation-email/', ResendActivationEmailView.as_view(), name='resend_activation_email'),
+    path('delete-user/', DeleteUserView.as_view(), name='delete_user'),
 ]
