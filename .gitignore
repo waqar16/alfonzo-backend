@@ -1,7 +1,0 @@
-# Ignore Django migrations
-**/migrations/*.py
-**/migrations/*.pyc
-
-
-# Ignore SQLite database
-db.sqlite3  # Adjust the filename if your database has a different name
